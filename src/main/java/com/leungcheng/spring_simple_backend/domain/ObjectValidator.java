@@ -11,7 +11,7 @@ class ObjectValidator {
     private static final ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
     private static final Validator validator = factory.getValidator();
 
-    public static <T> void validate(T object) {
+    static <T> void validate(T object) {
         Set<ConstraintViolation<T>> violations = validator.validate(object);
         if (!violations.isEmpty()) {
             StringBuilder sb = new StringBuilder();

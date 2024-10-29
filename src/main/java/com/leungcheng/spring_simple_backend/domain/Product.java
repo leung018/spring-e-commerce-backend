@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 
 @Entity
-class Product {
+public class Product {
     static class Builder {
         private String name;
         private double price;
