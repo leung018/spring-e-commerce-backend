@@ -35,7 +35,7 @@ class ProductTest {
     }
 
     @Test
-    void shouldRaiseExceptionIfViolateTheRule() {
+    void shouldRaiseExceptionIfViolateTheValidationConstraints() {
         Class<IllegalArgumentException> expected = IllegalArgumentException.class;
         assertThrows(expected, () -> {
             productBuilder()
