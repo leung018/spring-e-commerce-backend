@@ -28,28 +28,41 @@ public class Product {
         }
 
         public Product build() {
-            return new Product(name, price, quantity);
+            Product product = new Product();
+            product.name = name;
+            product.price = price;
+            product.quantity = quantity;
+            ObjectValidator.validate(product);
+
+            return product;
         }
     }
 
     @Id
-    public final String id;
+    private String id = java.util.UUID.randomUUID().toString();
 
     @NotBlank
-    public final String name;
+    private String name;
 
     @Min(0)
-    public final double price;
+    private double price;
 
     @Min(0)
-    public final int quantity;
+    private int quantity;
 
-    public Product(String name, double price, int quantity) {
-        this.id = java.util.UUID.randomUUID().toString();
-        this.name = name;
-        this.price = price;
-        this.quantity = quantity;
+    public String getId() {
+        return id;
+    }
 
-        ObjectValidator.validate(this);
+    public String getName() {
+        return name;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public int getQuantity() {
+        return quantity;
     }
 }

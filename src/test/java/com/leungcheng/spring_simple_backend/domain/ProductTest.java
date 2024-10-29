@@ -21,9 +21,9 @@ class ProductTest {
                 .quantity(50)
                 .build();
 
-        assertEquals("Product 1", product.name);
-        assertEquals(1.0, product.price);
-        assertEquals(50, product.quantity);
+        assertEquals("Product 1", product.getName());
+        assertEquals(1.0, product.getPrice());
+        assertEquals(50, product.getQuantity());
     }
 
     @Test
@@ -31,7 +31,7 @@ class ProductTest {
         Product product1 = productBuilder().build();
         Product product2 = productBuilder().build();
 
-        assertNotEquals(product1.id, product2.id);
+        assertNotEquals(product1.getId(), product2.getId());
     }
 
     @Test
