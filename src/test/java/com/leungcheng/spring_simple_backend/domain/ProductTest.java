@@ -36,9 +36,20 @@ class ProductTest {
 
     @Test
     void shouldRaiseExceptionIfViolateTheRule() {
-        assertThrows(IllegalArgumentException.class, () -> {
+        Class<IllegalArgumentException> expected = IllegalArgumentException.class;
+        assertThrows(expected, () -> {
             productBuilder()
                     .quantity(-1)
+                    .build();
+        });
+        assertThrows(expected, () -> {
+            productBuilder()
+                    .price(-1)
+                    .build();
+        });
+        assertThrows(expected, () -> {
+            productBuilder()
+                    .name("")
                     .build();
         });
     }
