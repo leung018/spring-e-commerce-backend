@@ -53,4 +53,14 @@ class ProductTest {
                     .build();
         });
     }
+
+    @Test
+    void shouldNotRaiseExceptionIfZero() {
+        assertDoesNotThrow(() -> {
+            productBuilder()
+                    .quantity(0)
+                    .price(0)
+                    .build();
+        });
+    }
 }
