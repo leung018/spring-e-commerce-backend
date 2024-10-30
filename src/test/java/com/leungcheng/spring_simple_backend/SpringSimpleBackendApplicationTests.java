@@ -31,4 +31,14 @@ class SpringSimpleBackendApplicationTests {
 			 	.andExpect(jsonPath("$.price").value(1.0))
 			 	.andExpect(jsonPath("$.quantity").value(50));
 	}
+
+	@Test
+	public void shouldRejectCreateProductWithInvalidData() throws Exception {
+		mockMvc.perform(post("/products")
+				.content("{\"name\": \"\", \"price\": 1.0, \"quantity\": 50}"))
+				.andExpect(status().isBadRequest());
+		mockMvc.perform(post("/products")
+				.content("{\"name\": \"Product 1\", \"price\": -1.0, \"quantity\": 50}"))
+				.andExpect(status().isBadRequest());
+	}
 }
