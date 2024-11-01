@@ -38,6 +38,8 @@ public class Product {
         }
     }
 
+    protected Product() {}
+
     @Id
     private String id = java.util.UUID.randomUUID().toString();
 
