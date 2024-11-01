@@ -1,5 +1,6 @@
 package com.leungcheng.spring_simple_backend.domain;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.Min;
@@ -41,6 +42,7 @@ public class Product {
     protected Product() {}
 
     @Id
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String id = java.util.UUID.randomUUID().toString();
 
     @NotBlank

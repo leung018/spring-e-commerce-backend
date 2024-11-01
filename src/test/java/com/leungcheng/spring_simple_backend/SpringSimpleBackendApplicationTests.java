@@ -11,6 +11,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.hamcrest.Matchers.not;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -36,6 +37,15 @@ class SpringSimpleBackendApplicationTests {
 			 	.andExpect(jsonPath("$.name").value("Product 1"))
 			 	.andExpect(jsonPath("$.price").value(1.0))
 			 	.andExpect(jsonPath("$.quantity").value(50));
+	}
+
+	@Test
+	public void shouldIgnoreIdWhenCreateProduct() throws Exception {
+		mockMvc.perform(post("/products")
+				.contentType("application/json")
+				.content("{\"id\": \"should-be-ignored\", \"name\": \"Product 1\", \"price\": 1.0, \"quantity\": 50}"))
+				.andExpect(status().isCreated())
+				.andExpect(jsonPath("$.id", not("should-be-ignored")));
 	}
 
 	@Test
