@@ -39,7 +39,7 @@ public class Product {
         }
     }
 
-    protected Product() {}
+    private Product() {}
 
     @Id
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
