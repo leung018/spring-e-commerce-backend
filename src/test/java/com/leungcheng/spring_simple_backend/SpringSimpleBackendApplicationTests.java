@@ -10,9 +10,8 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.hamcrest.Matchers.not;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -59,6 +58,13 @@ class SpringSimpleBackendApplicationTests {
 		params.price = -1;
 		createProduct(params)
 				.andExpect(status().isBadRequest());
+	}
+
+	@Test
+	public void shouldGet404WhenProductNotFound() throws Exception {
+		mockMvc.perform(get("/products/invalid-id"))
+				.andExpect(status().isNotFound())
+				.andExpect(content().string("Could not find product invalid-id"));
 	}
 
 	private static class CreateProductParams {

@@ -20,7 +20,7 @@ public class ProductController {
 
     @GetMapping("/products/{id}")
     Product one(@PathVariable String id) {
-        return repository.findById(id).orElseThrow(() -> new IllegalArgumentException("TODO"));
+        return repository.findById(id).orElseThrow(() -> new ProductNotFoundException(id));
     }
 
 }
