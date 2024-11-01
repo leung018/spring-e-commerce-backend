@@ -7,6 +7,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -22,21 +23,20 @@ class SpringSimpleBackendApplicationTests {
 
 	@Test
 	public void shouldCreateAndGetProduct() throws Exception {
-	 	MvcResult mvcResult = mockMvc.perform(post("/products")
-				.contentType("application/json")
-				.content("{\"name\": \"Product 1\", \"price\": 1.0, \"quantity\": 50}"))
+		CreateProductParams params = validParams();
+	 	MvcResult mvcResult = createProduct(params)
 				.andExpect(status().isCreated())
-				.andExpect(jsonPath("$.name").value("Product 1"))
-				.andExpect(jsonPath("$.price").value(1.0))
-				.andExpect(jsonPath("$.quantity").value(50))
+				.andExpect(jsonPath("$.name").value(params.name))
+				.andExpect(jsonPath("$.price").value(params.price))
+				.andExpect(jsonPath("$.quantity").value(params.quantity))
 				.andReturn();
 		String id = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.id");
 
         mockMvc.perform(get("/products/" + id))
 				.andExpect(status().isOk())
-			 	.andExpect(jsonPath("$.name").value("Product 1"))
-			 	.andExpect(jsonPath("$.price").value(1.0))
-			 	.andExpect(jsonPath("$.quantity").value(50));
+				.andExpect(jsonPath("$.name").value(params.name))
+				.andExpect(jsonPath("$.price").value(params.price))
+				.andExpect(jsonPath("$.quantity").value(params.quantity));
 	}
 
 	@Test
@@ -50,13 +50,34 @@ class SpringSimpleBackendApplicationTests {
 
 	@Test
 	public void shouldRejectCreateProductWithInvalidData() throws Exception {
-		mockMvc.perform(post("/products")
-				.contentType("application/json")
-				.content("{\"name\": \"\", \"price\": 1.0, \"quantity\": 50}"))
+		CreateProductParams params = validParams();
+		params.name = "";
+		createProduct(params)
 				.andExpect(status().isBadRequest());
-		mockMvc.perform(post("/products")
-				.contentType("application/json")
-				.content("{\"name\": \"Product 1\", \"price\": -1.0, \"quantity\": 50}"))
+
+		params = validParams();
+		params.price = -1;
+		createProduct(params)
 				.andExpect(status().isBadRequest());
+	}
+
+	private static class CreateProductParams {
+		String name;
+		double price;
+		int quantity;
+	}
+
+	private CreateProductParams validParams() {
+		CreateProductParams params = new CreateProductParams();
+		params.name = "Product 1";
+		params.price = 1.0;
+		params.quantity = 50;
+		return params;
+	}
+
+	private ResultActions createProduct(CreateProductParams params) throws Exception {
+		return mockMvc.perform(post("/products")
+				.contentType("application/json")
+				.content("{\"name\": \"" + params.name + "\", \"price\": " + params.price + ", \"quantity\": " + params.quantity + "}"));
 	}
 }
