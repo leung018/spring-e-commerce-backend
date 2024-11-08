@@ -70,6 +70,23 @@ class SpringSimpleBackendApplicationTests {
         .andExpect(content().string("Could not find product invalid-id"));
   }
 
+  @Test
+  public void shouldSignupAndLogin() throws Exception {
+    mockMvc
+        .perform(
+            post("/signup")
+                .contentType("application/json")
+                .content("{\"username\": \"user\", \"password\": \"password\"}"))
+        .andExpect(status().isCreated());
+
+    mockMvc
+        .perform(
+            post("/login")
+                .contentType("application/json")
+                .content("{\"username\": \"user\", \"password\": \"password\"}"))
+        .andExpect(status().isOk());
+  }
+
   private static class CreateProductParams {
     String name;
     double price;
