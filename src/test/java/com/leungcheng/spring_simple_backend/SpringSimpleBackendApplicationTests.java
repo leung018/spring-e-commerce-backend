@@ -99,6 +99,31 @@ class SpringSimpleBackendApplicationTests {
   }
 
   @Test
+  public void shouldRejectSignupWhenUsernameExists() throws Exception {
+    mockMvc
+        .perform(
+            post("/signup")
+                .contentType("application/json")
+                .content("{\"username\": \"user\", \"password\": \"password\"}"))
+        .andExpect(status().isCreated());
+
+    mockMvc
+        .perform(
+            post("/signup")
+                .contentType("application/json")
+                .content("{\"username\": \"user\", \"password\": \"password2\"}"))
+        .andExpect(status().isBadRequest())
+        .andExpect(content().string("Username user already exists"));
+
+    mockMvc
+        .perform(
+            post("/login")
+                .contentType("application/json")
+                .content("{\"username\": \"user\", \"password\": \"password2\"}"))
+        .andExpect(status().isForbidden());
+  }
+
+  @Test
   public void shouldRejectLoginWithIncorrectPassword() throws Exception {
     mockMvc
         .perform(

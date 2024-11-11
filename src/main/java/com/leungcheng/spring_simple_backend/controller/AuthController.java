@@ -23,6 +23,10 @@ public class AuthController {
   @PostMapping("/signup")
   @ResponseStatus(HttpStatus.CREATED)
   public void signup(@Valid @RequestBody LoginRequest loginRequest) {
+    if (this.userRepository.findByUsername(loginRequest.username()) != null) {
+      throw new UsernameAlreadyExistsException(loginRequest.username());
+    }
+
     String hashedPassword = passwordEncoder.encode(loginRequest.password());
     User user =
         new User.Builder().username(loginRequest.username()).password(hashedPassword).build();
