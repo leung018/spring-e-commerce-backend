@@ -114,6 +114,16 @@ class SpringSimpleBackendApplicationTests {
         .andExpect(status().isForbidden());
   }
 
+  @Test
+  public void shouldRejectLoginWithNonexistentUsername() throws Exception {
+    mockMvc
+        .perform(
+            post("/login")
+                .contentType("application/json")
+                .content("{\"username\": \"nonexistent-user\", \"password\": \"password\"}"))
+        .andExpect(status().isForbidden());
+  }
+
   private static class CreateProductParams {
     String name;
     double price;
