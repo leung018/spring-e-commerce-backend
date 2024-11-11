@@ -40,6 +40,7 @@ public class AuthController {
         UsernamePasswordAuthenticationToken.unauthenticated(
             userCredentials.username(), userCredentials.password());
     this.authenticationManager.authenticate(authenticationRequest);
+    // TODO: Let client persist session or return JWT token
   }
 
   public record UserCredentials(String username, String password) {}
