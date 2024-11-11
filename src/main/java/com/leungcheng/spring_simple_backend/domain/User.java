@@ -3,6 +3,7 @@ package com.leungcheng.spring_simple_backend.domain;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.Min;
 import java.util.Collection;
 import java.util.List;
@@ -10,6 +11,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 @Entity
+@Table(name = "users")
 public class User implements UserDetails {
   public static class Builder {
     private double balance = 0;

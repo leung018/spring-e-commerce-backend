@@ -5,6 +5,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.jayway.jsonpath.JsonPath;
+import com.leungcheng.spring_simple_backend.domain.ProductRepository;
+import com.leungcheng.spring_simple_backend.domain.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -18,6 +21,14 @@ import org.springframework.test.web.servlet.ResultActions;
 class SpringSimpleBackendApplicationTests {
 
   @Autowired private MockMvc mockMvc;
+  @Autowired private ProductRepository productRepository;
+  @Autowired private UserRepository userRepository;
+
+  @BeforeEach
+  public void setup() {
+    productRepository.deleteAll();
+    userRepository.deleteAll();
+  }
 
   @Test
   public void shouldCreateAndGetProduct() throws Exception {
@@ -85,6 +96,22 @@ class SpringSimpleBackendApplicationTests {
                 .contentType("application/json")
                 .content("{\"username\": \"user\", \"password\": \"password\"}"))
         .andExpect(status().isOk());
+  }
+
+  @Test
+  public void shouldRejectLoginWithIncorrectPassword() throws Exception {
+    mockMvc
+        .perform(
+            post("/signup")
+                .contentType("application/json")
+                .content("{\"username\": \"user\", \"password\": \"password\"}"))
+        .andExpect(status().isCreated());
+    mockMvc
+        .perform(
+            post("/login")
+                .contentType("application/json")
+                .content("{\"username\": \"user\", \"password\": \"invalid-password\"}"))
+        .andExpect(status().isForbidden());
   }
 
   private static class CreateProductParams {
