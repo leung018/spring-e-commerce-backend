@@ -12,4 +12,10 @@ class ExceptionHandlerAdvice {
   String productNotFoundHandler(ProductNotFoundException ex) {
     return ex.getMessage();
   }
+
+  @ExceptionHandler(UsernameAlreadyExistsException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  String usernameAlreadyExistsHandler(UsernameAlreadyExistsException ex) {
+    return ex.getMessage();
+  }
 }

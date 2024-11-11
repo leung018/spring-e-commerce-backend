@@ -5,6 +5,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.jayway.jsonpath.JsonPath;
+import com.leungcheng.spring_simple_backend.domain.ProductRepository;
+import com.leungcheng.spring_simple_backend.domain.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -18,6 +21,14 @@ import org.springframework.test.web.servlet.ResultActions;
 class SpringSimpleBackendApplicationTests {
 
   @Autowired private MockMvc mockMvc;
+  @Autowired private ProductRepository productRepository;
+  @Autowired private UserRepository userRepository;
+
+  @BeforeEach
+  public void setup() {
+    productRepository.deleteAll();
+    userRepository.deleteAll();
+  }
 
   @Test
   public void shouldCreateAndGetProduct() throws Exception {
@@ -70,18 +81,49 @@ class SpringSimpleBackendApplicationTests {
         .andExpect(content().string("Could not find product invalid-id"));
   }
 
+  @Test
+  public void shouldSignupAndLogin() throws Exception {
+    UserCredentials userCredentials = sampleUserCredentials();
+    signup(userCredentials).andExpect(status().isCreated());
+    login(userCredentials).andExpect(status().isOk());
+  }
+
+  @Test
+  public void shouldRejectSignupWhenUsernameExists() throws Exception {
+    signup(new UserCredentials("user", "password")).andExpect(status().isCreated());
+
+    UserCredentials otherUserCredentials = new UserCredentials("user", "password2");
+    signup(otherUserCredentials)
+        .andExpect(status().isBadRequest())
+        .andExpect(content().string("Username user already exists"));
+    login(otherUserCredentials).andExpect(status().isForbidden());
+  }
+
+  @Test
+  public void shouldRejectLoginWithIncorrectPassword() throws Exception {
+    signup(new UserCredentials("user", "password")).andExpect(status().isCreated());
+    login(new UserCredentials("user", "invalid")).andExpect(status().isForbidden());
+  }
+
+  @Test
+  public void shouldRejectLoginWithNonexistentUsername() throws Exception {
+    login(new UserCredentials("nonexistent-user", "password")).andExpect(status().isForbidden());
+  }
+
   private static class CreateProductParams {
     String name;
     double price;
     int quantity;
+
+    private CreateProductParams(String name, double price, int quantity) {
+      this.name = name;
+      this.price = price;
+      this.quantity = quantity;
+    }
   }
 
   private CreateProductParams validParams() {
-    CreateProductParams params = new CreateProductParams();
-    params.name = "Product 1";
-    params.price = 1.0;
-    params.quantity = 50;
-    return params;
+    return new CreateProductParams("Product 1", 1.0, 50);
   }
 
   private ResultActions createProduct(CreateProductParams params) throws Exception {
@@ -96,5 +138,43 @@ class SpringSimpleBackendApplicationTests {
                     + ", \"quantity\": "
                     + params.quantity
                     + "}"));
+  }
+
+  private static class UserCredentials {
+    String username;
+    String password;
+
+    private UserCredentials(String username, String password) {
+      this.username = username;
+      this.password = password;
+    }
+  }
+
+  private UserCredentials sampleUserCredentials() {
+    return new UserCredentials("sample-user", "sample-password");
+  }
+
+  private ResultActions signup(UserCredentials userCredentials) throws Exception {
+    return mockMvc.perform(
+        post("/signup")
+            .contentType("application/json")
+            .content(
+                "{\"username\": \""
+                    + userCredentials.username
+                    + "\", \"password\": \""
+                    + userCredentials.password
+                    + "\"}"));
+  }
+
+  private ResultActions login(UserCredentials userCredentials) throws Exception {
+    return mockMvc.perform(
+        post("/login")
+            .contentType("application/json")
+            .content(
+                "{\"username\": \""
+                    + userCredentials.username
+                    + "\", \"password\": \""
+                    + userCredentials.password
+                    + "\"}"));
   }
 }
