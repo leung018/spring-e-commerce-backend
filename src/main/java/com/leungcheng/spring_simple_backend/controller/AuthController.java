@@ -22,25 +22,25 @@ public class AuthController {
 
   @PostMapping("/signup")
   @ResponseStatus(HttpStatus.CREATED)
-  public void signup(@Valid @RequestBody LoginRequest loginRequest) {
-    if (this.userRepository.findByUsername(loginRequest.username()) != null) {
-      throw new UsernameAlreadyExistsException(loginRequest.username());
+  public void signup(@Valid @RequestBody AuthController.UserCredentials userCredentials) {
+    if (this.userRepository.findByUsername(userCredentials.username()) != null) {
+      throw new UsernameAlreadyExistsException(userCredentials.username());
     }
 
-    String hashedPassword = passwordEncoder.encode(loginRequest.password());
+    String hashedPassword = passwordEncoder.encode(userCredentials.password());
     User user =
-        new User.Builder().username(loginRequest.username()).password(hashedPassword).build();
+        new User.Builder().username(userCredentials.username()).password(hashedPassword).build();
     this.userRepository.save(user);
   }
 
   @PostMapping("/login")
   @ResponseStatus(HttpStatus.OK)
-  public void login(@Valid @RequestBody LoginRequest loginRequest) {
+  public void login(@Valid @RequestBody AuthController.UserCredentials userCredentials) {
     Authentication authenticationRequest =
         UsernamePasswordAuthenticationToken.unauthenticated(
-            loginRequest.username(), loginRequest.password());
+            userCredentials.username(), userCredentials.password());
     this.authenticationManager.authenticate(authenticationRequest);
   }
 
-  public record LoginRequest(String username, String password) {}
+  public record UserCredentials(String username, String password) {}
 }
