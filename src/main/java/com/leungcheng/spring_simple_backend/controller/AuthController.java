@@ -23,7 +23,7 @@ public class AuthController {
   @PostMapping("/signup")
   @ResponseStatus(HttpStatus.CREATED)
   public void signup(@Valid @RequestBody AuthController.UserCredentials userCredentials) {
-    if (this.userRepository.findByUsername(userCredentials.username()) != null) {
+    if (this.userRepository.findByUsername(userCredentials.username()).isPresent()) {
       throw new UsernameAlreadyExistsException(userCredentials.username());
     }
 
