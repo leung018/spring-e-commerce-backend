@@ -114,14 +114,16 @@ class SpringSimpleBackendApplicationTests {
     String name;
     double price;
     int quantity;
+
+    private CreateProductParams(String name, double price, int quantity) {
+      this.name = name;
+      this.price = price;
+      this.quantity = quantity;
+    }
   }
 
   private CreateProductParams validParams() {
-    CreateProductParams params = new CreateProductParams();
-    params.name = "Product 1";
-    params.price = 1.0;
-    params.quantity = 50;
-    return params;
+    return new CreateProductParams("Product 1", 1.0, 50);
   }
 
   private ResultActions createProduct(CreateProductParams params) throws Exception {
