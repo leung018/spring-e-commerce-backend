@@ -83,70 +83,31 @@ class SpringSimpleBackendApplicationTests {
 
   @Test
   public void shouldSignupAndLogin() throws Exception {
-    mockMvc
-        .perform(
-            post("/signup")
-                .contentType("application/json")
-                .content("{\"username\": \"user\", \"password\": \"password\"}"))
-        .andExpect(status().isCreated());
-
-    mockMvc
-        .perform(
-            post("/login")
-                .contentType("application/json")
-                .content("{\"username\": \"user\", \"password\": \"password\"}"))
-        .andExpect(status().isOk());
+    UserCredentials userCredentials = sampleUserCredentials();
+    signup(userCredentials).andExpect(status().isCreated());
+    login(userCredentials).andExpect(status().isOk());
   }
 
   @Test
   public void shouldRejectSignupWhenUsernameExists() throws Exception {
-    mockMvc
-        .perform(
-            post("/signup")
-                .contentType("application/json")
-                .content("{\"username\": \"user\", \"password\": \"password\"}"))
-        .andExpect(status().isCreated());
+    signup(new UserCredentials("user", "password")).andExpect(status().isCreated());
 
-    mockMvc
-        .perform(
-            post("/signup")
-                .contentType("application/json")
-                .content("{\"username\": \"user\", \"password\": \"password2\"}"))
+    UserCredentials otherUserCredentials = new UserCredentials("user", "password2");
+    signup(otherUserCredentials)
         .andExpect(status().isBadRequest())
         .andExpect(content().string("Username user already exists"));
-
-    mockMvc
-        .perform(
-            post("/login")
-                .contentType("application/json")
-                .content("{\"username\": \"user\", \"password\": \"password2\"}"))
-        .andExpect(status().isForbidden());
+    login(otherUserCredentials).andExpect(status().isForbidden());
   }
 
   @Test
   public void shouldRejectLoginWithIncorrectPassword() throws Exception {
-    mockMvc
-        .perform(
-            post("/signup")
-                .contentType("application/json")
-                .content("{\"username\": \"user\", \"password\": \"password\"}"))
-        .andExpect(status().isCreated());
-    mockMvc
-        .perform(
-            post("/login")
-                .contentType("application/json")
-                .content("{\"username\": \"user\", \"password\": \"invalid-password\"}"))
-        .andExpect(status().isForbidden());
+    signup(new UserCredentials("user", "password")).andExpect(status().isCreated());
+    login(new UserCredentials("user", "invalid")).andExpect(status().isForbidden());
   }
 
   @Test
   public void shouldRejectLoginWithNonexistentUsername() throws Exception {
-    mockMvc
-        .perform(
-            post("/login")
-                .contentType("application/json")
-                .content("{\"username\": \"nonexistent-user\", \"password\": \"password\"}"))
-        .andExpect(status().isForbidden());
+    login(new UserCredentials("nonexistent-user", "password")).andExpect(status().isForbidden());
   }
 
   private static class CreateProductParams {
@@ -175,5 +136,43 @@ class SpringSimpleBackendApplicationTests {
                     + ", \"quantity\": "
                     + params.quantity
                     + "}"));
+  }
+
+  private static class UserCredentials {
+    String username;
+    String password;
+
+    private UserCredentials(String username, String password) {
+      this.username = username;
+      this.password = password;
+    }
+  }
+
+  private UserCredentials sampleUserCredentials() {
+    return new UserCredentials("sample-user", "sample-password");
+  }
+
+  private ResultActions signup(UserCredentials userCredentials) throws Exception {
+    return mockMvc.perform(
+        post("/signup")
+            .contentType("application/json")
+            .content(
+                "{\"username\": \""
+                    + userCredentials.username
+                    + "\", \"password\": \""
+                    + userCredentials.password
+                    + "\"}"));
+  }
+
+  private ResultActions login(UserCredentials userCredentials) throws Exception {
+    return mockMvc.perform(
+        post("/login")
+            .contentType("application/json")
+            .content(
+                "{\"username\": \""
+                    + userCredentials.username
+                    + "\", \"password\": \""
+                    + userCredentials.password
+                    + "\"}"));
   }
 }
