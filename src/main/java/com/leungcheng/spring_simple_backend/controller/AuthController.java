@@ -35,13 +35,16 @@ public class AuthController {
 
   @PostMapping("/login")
   @ResponseStatus(HttpStatus.OK)
-  public void login(@Valid @RequestBody AuthController.UserCredentials userCredentials) {
+  public LoginResponse login(@Valid @RequestBody AuthController.UserCredentials userCredentials) {
     Authentication authenticationRequest =
         UsernamePasswordAuthenticationToken.unauthenticated(
             userCredentials.username(), userCredentials.password());
     this.authenticationManager.authenticate(authenticationRequest);
-    // TODO: Let client persist session or return JWT token
+    // TODO: implement jwt service and obtains token from it
+    return new LoginResponse("dummy");
   }
 
   public record UserCredentials(String username, String password) {}
+
+  public record LoginResponse(String token) {}
 }

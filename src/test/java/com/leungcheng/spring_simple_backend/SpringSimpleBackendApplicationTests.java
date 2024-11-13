@@ -85,7 +85,7 @@ class SpringSimpleBackendApplicationTests {
   public void shouldSignupAndLogin() throws Exception {
     UserCredentials userCredentials = sampleUserCredentials();
     signup(userCredentials).andExpect(status().isCreated());
-    login(userCredentials).andExpect(status().isOk());
+    login(userCredentials).andExpect(status().isOk()).andExpect(jsonPath("$.token").isString());
   }
 
   @Test
