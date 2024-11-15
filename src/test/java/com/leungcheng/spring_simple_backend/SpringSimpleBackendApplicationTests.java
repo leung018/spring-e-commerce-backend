@@ -1,20 +1,27 @@
 package com.leungcheng.spring_simple_backend;
 
 import static org.hamcrest.Matchers.not;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.jayway.jsonpath.JsonPath;
+import com.leungcheng.spring_simple_backend.domain.JwtService;
 import com.leungcheng.spring_simple_backend.domain.ProductRepository;
+import com.leungcheng.spring_simple_backend.domain.User;
 import com.leungcheng.spring_simple_backend.domain.UserRepository;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -24,10 +31,18 @@ class SpringSimpleBackendApplicationTests {
   @Autowired private ProductRepository productRepository;
   @Autowired private UserRepository userRepository;
 
+  @MockBean private JwtService jwtService;
+
+  private Optional<String> accessToken = Optional.empty();
+
   @BeforeEach
   public void setup() {
     productRepository.deleteAll();
     userRepository.deleteAll();
+  }
+
+  private void setAccessToken(String token) {
+    this.accessToken = Optional.of(token);
   }
 
   @Test
@@ -110,6 +125,23 @@ class SpringSimpleBackendApplicationTests {
     login(new UserCredentials("nonexistent-user", "password")).andExpect(status().isForbidden());
   }
 
+  @Test
+  public void shouldCreateProductWithUserIdSameAsCreator() throws Exception {
+    UserCredentials userCredentials = sampleUserCredentials();
+    signup(userCredentials);
+    MvcResult result = login(userCredentials).andReturn();
+    String token = JsonPath.read(result.getResponse().getContentAsString(), "$.token");
+    setAccessToken(token);
+
+    User user = userRepository.findByUsername(userCredentials.username).orElseThrow();
+    when(jwtService.parseToken(anyString())).thenReturn(new JwtService.UserInfo(user.getId()));
+
+    CreateProductParams params = validParams();
+    createProduct(params)
+        .andExpect(status().isCreated())
+        .andExpect(jsonPath("$.userId").value(user.getId()));
+  }
+
   private static class CreateProductParams {
     String name;
     double price;
@@ -127,7 +159,7 @@ class SpringSimpleBackendApplicationTests {
   }
 
   private ResultActions createProduct(CreateProductParams params) throws Exception {
-    return mockMvc.perform(
+    MockHttpServletRequestBuilder builder =
         post("/products")
             .contentType("application/json")
             .content(
@@ -137,7 +169,9 @@ class SpringSimpleBackendApplicationTests {
                     + params.price
                     + ", \"quantity\": "
                     + params.quantity
-                    + "}"));
+                    + "}");
+    this.accessToken.ifPresent(s -> builder.header("Authorization", "Bearer " + s));
+    return mockMvc.perform(builder);
   }
 
   private static class UserCredentials {
