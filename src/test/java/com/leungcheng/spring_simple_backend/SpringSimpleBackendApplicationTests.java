@@ -45,6 +45,10 @@ class SpringSimpleBackendApplicationTests {
     this.accessToken = Optional.of(token);
   }
 
+  private void clearAccessToken() {
+    this.accessToken = Optional.empty();
+  }
+
   private String loginWithNewUser() throws Exception {
     UserCredentials userCredentials = sampleUserCredentials();
 
@@ -138,6 +142,12 @@ class SpringSimpleBackendApplicationTests {
   @Test
   public void shouldRejectLoginWithNonexistentUsername() throws Exception {
     login(new UserCredentials("nonexistent-user", "password")).andExpect(status().isForbidden());
+  }
+
+  @Test
+  public void shouldRejectNonAuthApiCallWithoutToken() throws Exception {
+    clearAccessToken();
+    createProduct(validParams()).andExpect(status().isForbidden());
   }
 
   @Test
