@@ -45,6 +45,8 @@ public class Product {
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   private String id = java.util.UUID.randomUUID().toString();
 
+  private String userId;
+
   @NotBlank private String name;
 
   @Min(0)
@@ -55,6 +57,15 @@ public class Product {
 
   public String getId() {
     return id;
+  }
+
+  public String getUserId() {
+    return userId;
+  }
+
+  public String setUserId(String userId) {
+    this.userId = userId;
+    return userId;
   }
 
   public String getName() {
