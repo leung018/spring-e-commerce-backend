@@ -50,7 +50,7 @@ class SpringSimpleBackendApplicationTests {
 
     signup(userCredentials).andExpect(status().isCreated());
 
-    MvcResult result = login(userCredentials).andReturn();
+    MvcResult result = login(userCredentials).andExpect(status().isOk()).andReturn();
     String token = JsonPath.read(result.getResponse().getContentAsString(), "$.token");
     setAccessToken(token);
 
@@ -116,13 +116,6 @@ class SpringSimpleBackendApplicationTests {
     getProduct("invalid-id")
         .andExpect(status().isNotFound())
         .andExpect(content().string("Could not find product invalid-id"));
-  }
-
-  @Test
-  public void shouldSignupAndLogin() throws Exception {
-    UserCredentials userCredentials = sampleUserCredentials();
-    signup(userCredentials).andExpect(status().isCreated());
-    login(userCredentials).andExpect(status().isOk()).andExpect(jsonPath("$.token").isString());
   }
 
   @Test
