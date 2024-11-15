@@ -45,8 +45,25 @@ class SpringSimpleBackendApplicationTests {
     this.accessToken = Optional.of(token);
   }
 
+  private String loginWithNewUser() throws Exception {
+    UserCredentials userCredentials = sampleUserCredentials();
+
+    signup(userCredentials).andExpect(status().isCreated());
+
+    MvcResult result = login(userCredentials).andReturn();
+    String token = JsonPath.read(result.getResponse().getContentAsString(), "$.token");
+    setAccessToken(token);
+
+    User user = userRepository.findByUsername(userCredentials.username).orElseThrow();
+    when(jwtService.parseToken(anyString())).thenReturn(new JwtService.UserInfo(user.getId()));
+
+    return user.getId();
+  }
+
   @Test
   public void shouldCreateAndGetProduct() throws Exception {
+    loginWithNewUser();
+
     CreateProductParams params = validParams();
     MvcResult mvcResult =
         createProduct(params)
@@ -55,10 +72,9 @@ class SpringSimpleBackendApplicationTests {
             .andExpect(jsonPath("$.price").value(params.price))
             .andExpect(jsonPath("$.quantity").value(params.quantity))
             .andReturn();
-    String id = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.id");
+    String productId = JsonPath.read(mvcResult.getResponse().getContentAsString(), "$.id");
 
-    mockMvc
-        .perform(get("/products/" + id))
+    getProduct(productId)
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.name").value(params.name))
         .andExpect(jsonPath("$.price").value(params.price))
@@ -67,10 +83,13 @@ class SpringSimpleBackendApplicationTests {
 
   @Test
   public void shouldIgnoreIdWhenCreateProduct() throws Exception {
+    loginWithNewUser();
+
     mockMvc
         .perform(
             post("/products")
                 .contentType("application/json")
+                .header("Authorization", "Bearer " + accessToken)
                 .content(
                     "{\"id\": \"should-be-ignored\", \"name\": \"Product 1\", \"price\": 1.0, \"quantity\": 50}"))
         .andExpect(status().isCreated())
@@ -79,6 +98,8 @@ class SpringSimpleBackendApplicationTests {
 
   @Test
   public void shouldRejectCreateProductWithInvalidData() throws Exception {
+    loginWithNewUser();
+
     CreateProductParams params = validParams();
     params.name = "";
     createProduct(params).andExpect(status().isBadRequest());
@@ -90,8 +111,9 @@ class SpringSimpleBackendApplicationTests {
 
   @Test
   public void shouldGet404WhenProductNotFound() throws Exception {
-    mockMvc
-        .perform(get("/products/invalid-id"))
+    loginWithNewUser();
+
+    getProduct("invalid-id")
         .andExpect(status().isNotFound())
         .andExpect(content().string("Could not find product invalid-id"));
   }
@@ -127,19 +149,12 @@ class SpringSimpleBackendApplicationTests {
 
   @Test
   public void shouldCreateProductWithUserIdSameAsCreator() throws Exception {
-    UserCredentials userCredentials = sampleUserCredentials();
-    signup(userCredentials);
-    MvcResult result = login(userCredentials).andReturn();
-    String token = JsonPath.read(result.getResponse().getContentAsString(), "$.token");
-    setAccessToken(token);
-
-    User user = userRepository.findByUsername(userCredentials.username).orElseThrow();
-    when(jwtService.parseToken(anyString())).thenReturn(new JwtService.UserInfo(user.getId()));
+    String userId = loginWithNewUser();
 
     CreateProductParams params = validParams();
     createProduct(params)
         .andExpect(status().isCreated())
-        .andExpect(jsonPath("$.userId").value(user.getId()));
+        .andExpect(jsonPath("$.userId").value(userId));
   }
 
   private static class CreateProductParams {
@@ -170,6 +185,12 @@ class SpringSimpleBackendApplicationTests {
                     + ", \"quantity\": "
                     + params.quantity
                     + "}");
+    this.accessToken.ifPresent(s -> builder.header("Authorization", "Bearer " + s));
+    return mockMvc.perform(builder);
+  }
+
+  private ResultActions getProduct(String id) throws Exception {
+    MockHttpServletRequestBuilder builder = get("/products/" + id);
     this.accessToken.ifPresent(s -> builder.header("Authorization", "Bearer " + s));
     return mockMvc.perform(builder);
   }
