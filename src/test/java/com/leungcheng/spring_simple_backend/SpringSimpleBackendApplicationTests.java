@@ -55,11 +55,11 @@ class SpringSimpleBackendApplicationTests {
     signup(userCredentials).andExpect(status().isCreated());
 
     MvcResult result = login(userCredentials).andExpect(status().isOk()).andReturn();
-    String token = JsonPath.read(result.getResponse().getContentAsString(), "$.token");
+    String token = JsonPath.read(result.getResponse().getContentAsString(), "$.accessToken");
     setAccessToken(token);
 
     User user = userRepository.findByUsername(userCredentials.username).orElseThrow();
-    when(jwtService.parseToken(anyString())).thenReturn(new JwtService.UserInfo(user.getId()));
+    when(jwtService.parseAccessToken(anyString())).thenReturn(new JwtService.UserInfo(user.getId()));
 
     return user.getId();
   }

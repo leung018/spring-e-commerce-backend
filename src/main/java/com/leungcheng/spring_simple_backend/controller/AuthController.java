@@ -40,11 +40,11 @@ public class AuthController {
         UsernamePasswordAuthenticationToken.unauthenticated(
             userCredentials.username(), userCredentials.password());
     this.authenticationManager.authenticate(authenticationRequest);
-    // TODO: implement jwt service and obtains token from it
+    // TODO: implement jwt service and obtains accessToken from it
     return new LoginResponse("dummy");
   }
 
   public record UserCredentials(String username, String password) {}
 
-  public record LoginResponse(String token) {}
+  public record LoginResponse(String accessToken) {}
 }

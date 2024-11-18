@@ -28,7 +28,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         && authHeader.startsWith("Bearer ")
         && SecurityContextHolder.getContext().getAuthentication() == null) {
       String accessToken = authHeader.substring(7);
-      JwtService.UserInfo userInfo = jwtService.parseToken(accessToken);
+      JwtService.UserInfo userInfo = jwtService.parseAccessToken(accessToken);
 
       UserInfoAuthenticationToken authToken = new UserInfoAuthenticationToken(userInfo);
       SecurityContext context = SecurityContextHolder.createEmptyContext();
