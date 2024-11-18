@@ -1,7 +1,7 @@
 package com.leungcheng.spring_simple_backend;
 
 import static org.hamcrest.Matchers.not;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -53,13 +53,16 @@ class SpringSimpleBackendApplicationTests {
     UserCredentials userCredentials = sampleUserCredentials();
 
     signup(userCredentials).andExpect(status().isCreated());
+    User user = userRepository.findByUsername(userCredentials.username).orElseThrow();
+
+    when(jwtService.generateAccessToken(argThat(argument -> argument.getId().equals(user.getId()))))
+        .thenReturn("dummy-token");
+    when(jwtService.parseAccessToken("dummy-token"))
+        .thenReturn(new JwtService.UserInfo(user.getId()));
 
     MvcResult result = login(userCredentials).andExpect(status().isOk()).andReturn();
     String token = JsonPath.read(result.getResponse().getContentAsString(), "$.accessToken");
     setAccessToken(token);
-
-    User user = userRepository.findByUsername(userCredentials.username).orElseThrow();
-    when(jwtService.parseAccessToken(anyString())).thenReturn(new JwtService.UserInfo(user.getId()));
 
     return user.getId();
   }
@@ -93,7 +96,7 @@ class SpringSimpleBackendApplicationTests {
         .perform(
             post("/products")
                 .contentType("application/json")
-                .header("Authorization", "Bearer " + accessToken)
+                .header("Authorization", "Bearer " + accessToken.orElseThrow())
                 .content(
                     "{\"id\": \"should-be-ignored\", \"name\": \"Product 1\", \"price\": 1.0, \"quantity\": 50}"))
         .andExpect(status().isCreated())

@@ -1,5 +1,6 @@
 package com.leungcheng.spring_simple_backend.controller;
 
+import com.leungcheng.spring_simple_backend.domain.JwtService;
 import com.leungcheng.spring_simple_backend.domain.User;
 import com.leungcheng.spring_simple_backend.domain.UserRepository;
 import jakarta.validation.Valid;
@@ -19,6 +20,7 @@ public class AuthController {
   @Autowired private AuthenticationManager authenticationManager;
   @Autowired private UserRepository userRepository;
   @Autowired private PasswordEncoder passwordEncoder;
+  @Autowired private JwtService JwtService;
 
   @PostMapping("/signup")
   @ResponseStatus(HttpStatus.CREATED)
@@ -40,8 +42,9 @@ public class AuthController {
         UsernamePasswordAuthenticationToken.unauthenticated(
             userCredentials.username(), userCredentials.password());
     this.authenticationManager.authenticate(authenticationRequest);
-    // TODO: implement jwt service and obtains accessToken from it
-    return new LoginResponse("dummy");
+    User user = this.userRepository.findByUsername(userCredentials.username()).orElseThrow();
+    String accessToken = JwtService.generateAccessToken(user);
+    return new LoginResponse(accessToken);
   }
 
   public record UserCredentials(String username, String password) {}
