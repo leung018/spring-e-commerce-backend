@@ -7,9 +7,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -25,19 +23,16 @@ public class JwtAuthFilter extends OncePerRequestFilter {
       HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws ServletException, IOException {
     String authHeader = request.getHeader("Authorization");
-    String token;
-    String userId = null;
 
-    if (authHeader != null && authHeader.startsWith("Bearer ")) {
-      token = authHeader.substring(7);
-      userId = jwtService.parseToken(token).userId();
-    }
+    if (authHeader != null
+        && authHeader.startsWith("Bearer ")
+        && SecurityContextHolder.getContext().getAuthentication() == null) {
+      String accessToken = authHeader.substring(7);
+      JwtService.UserInfo userInfo = jwtService.parseToken(accessToken);
 
-    if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-      UsernamePasswordAuthenticationToken auth =
-          new UsernamePasswordAuthenticationToken(userId, null, Collections.emptyList());
+      UserInfoAuthenticationToken authToken = new UserInfoAuthenticationToken(userInfo);
       SecurityContext context = SecurityContextHolder.createEmptyContext();
-      context.setAuthentication(auth);
+      context.setAuthentication(authToken);
       SecurityContextHolder.setContext(context);
     }
 
