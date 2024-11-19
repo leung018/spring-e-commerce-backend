@@ -62,6 +62,10 @@ public class User implements UserDetails {
     return List.of(); // TODO: May be not return empty list
   }
 
+  public String getId() {
+    return id;
+  }
+
   @Override
   public String getPassword() {
     return password;
