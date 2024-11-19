@@ -49,7 +49,7 @@ class SpringSimpleBackendApplicationTests {
     this.accessToken = Optional.empty();
   }
 
-  private String loginWithNewUser() throws Exception {
+  private String useNewUserAccessToken() throws Exception {
     UserCredentials userCredentials = sampleUserCredentials();
 
     signup(userCredentials).andExpect(status().isCreated());
@@ -69,7 +69,7 @@ class SpringSimpleBackendApplicationTests {
 
   @Test
   public void shouldCreateAndGetProduct() throws Exception {
-    loginWithNewUser();
+    useNewUserAccessToken();
 
     CreateProductParams params = validParams();
     MvcResult mvcResult =
@@ -90,7 +90,7 @@ class SpringSimpleBackendApplicationTests {
 
   @Test
   public void shouldIgnoreIdWhenCreateProduct() throws Exception {
-    loginWithNewUser();
+    useNewUserAccessToken();
 
     mockMvc
         .perform(
@@ -105,7 +105,7 @@ class SpringSimpleBackendApplicationTests {
 
   @Test
   public void shouldRejectCreateProductWithInvalidData() throws Exception {
-    loginWithNewUser();
+    useNewUserAccessToken();
 
     CreateProductParams params = validParams();
     params.name = "";
@@ -118,7 +118,7 @@ class SpringSimpleBackendApplicationTests {
 
   @Test
   public void shouldGet404WhenProductNotFound() throws Exception {
-    loginWithNewUser();
+    useNewUserAccessToken();
 
     getProduct("invalid-id")
         .andExpect(status().isNotFound())
@@ -155,7 +155,7 @@ class SpringSimpleBackendApplicationTests {
 
   @Test
   public void shouldCreateProductWithUserIdSameAsCreator() throws Exception {
-    String userId = loginWithNewUser();
+    String userId = useNewUserAccessToken();
 
     CreateProductParams params = validParams();
     createProduct(params)
