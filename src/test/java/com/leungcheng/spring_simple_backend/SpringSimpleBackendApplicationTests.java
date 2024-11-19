@@ -162,7 +162,7 @@ class SpringSimpleBackendApplicationTests {
             post("/products")
                 .contentType("application/json")
                 .header("Authorization", "NotBearer " + accessToken.orElseThrow())
-                .content("{\"name\": \"Product 1\", \"price\": 1.0, \"quantity\": 50}"))
+                .content(validParams().toContent()))
         .andExpect(status().isForbidden());
 
     mockMvc
@@ -170,7 +170,7 @@ class SpringSimpleBackendApplicationTests {
             post("/products")
                 .contentType("application/json")
                 .header("Authorization", "Bearer ")
-                .content("{\"name\": \"Product 1\", \"price\": 1.0, \"quantity\": 50}"))
+                .content(validParams().toContent()))
         .andExpect(status().isForbidden());
   }
 
@@ -194,6 +194,16 @@ class SpringSimpleBackendApplicationTests {
       this.price = price;
       this.quantity = quantity;
     }
+
+    public String toContent() {
+      return "{\"name\": \""
+          + this.name
+          + "\", \"price\": "
+          + this.price
+          + ", \"quantity\": "
+          + this.quantity
+          + "}";
+    }
   }
 
   private CreateProductParams validParams() {
@@ -202,16 +212,7 @@ class SpringSimpleBackendApplicationTests {
 
   private ResultActions createProduct(CreateProductParams params) throws Exception {
     MockHttpServletRequestBuilder builder =
-        post("/products")
-            .contentType("application/json")
-            .content(
-                "{\"name\": \""
-                    + params.name
-                    + "\", \"price\": "
-                    + params.price
-                    + ", \"quantity\": "
-                    + params.quantity
-                    + "}");
+        post("/products").contentType("application/json").content(params.toContent());
     this.accessToken.ifPresent(s -> builder.header("Authorization", "Bearer " + s));
     return mockMvc.perform(builder);
   }
@@ -230,6 +231,10 @@ class SpringSimpleBackendApplicationTests {
       this.username = username;
       this.password = password;
     }
+
+    public String toContent() {
+      return "{\"username\": \"" + this.username + "\", \"password\": \"" + this.password + "\"}";
+    }
   }
 
   private UserCredentials sampleUserCredentials() {
@@ -238,25 +243,11 @@ class SpringSimpleBackendApplicationTests {
 
   private ResultActions signup(UserCredentials userCredentials) throws Exception {
     return mockMvc.perform(
-        post("/signup")
-            .contentType("application/json")
-            .content(
-                "{\"username\": \""
-                    + userCredentials.username
-                    + "\", \"password\": \""
-                    + userCredentials.password
-                    + "\"}"));
+        post("/signup").contentType("application/json").content(userCredentials.toContent()));
   }
 
   private ResultActions login(UserCredentials userCredentials) throws Exception {
     return mockMvc.perform(
-        post("/login")
-            .contentType("application/json")
-            .content(
-                "{\"username\": \""
-                    + userCredentials.username
-                    + "\", \"password\": \""
-                    + userCredentials.password
-                    + "\"}"));
+        post("/login").contentType("application/json").content(userCredentials.toContent()));
   }
 }
