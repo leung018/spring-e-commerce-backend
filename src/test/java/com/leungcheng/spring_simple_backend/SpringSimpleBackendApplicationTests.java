@@ -50,7 +50,7 @@ class SpringSimpleBackendApplicationTests {
   }
 
   private String useNewUserAccessToken() throws Exception {
-    UserCredentials userCredentials = sampleUserCredentials();
+    UserCredentials userCredentials = UserCredentials.sample();
 
     signup(userCredentials).andExpect(status().isCreated());
     User user = userRepository.findByUsername(userCredentials.username).orElseThrow();
@@ -71,7 +71,7 @@ class SpringSimpleBackendApplicationTests {
   public void shouldCreateAndGetProduct() throws Exception {
     useNewUserAccessToken();
 
-    CreateProductParams params = validParams();
+    CreateProductParams params = CreateProductParams.sample();
     MvcResult mvcResult =
         createProduct(params)
             .andExpect(status().isCreated())
@@ -107,11 +107,11 @@ class SpringSimpleBackendApplicationTests {
   public void shouldRejectCreateProductWithInvalidData() throws Exception {
     useNewUserAccessToken();
 
-    CreateProductParams params = validParams();
+    CreateProductParams params = CreateProductParams.sample();
     params.name = "";
     createProduct(params).andExpect(status().isBadRequest());
 
-    params = validParams();
+    params = CreateProductParams.sample();
     params.price = -1;
     createProduct(params).andExpect(status().isBadRequest());
   }
@@ -150,7 +150,7 @@ class SpringSimpleBackendApplicationTests {
   @Test
   public void shouldRejectNonAuthApiCallWithoutToken() throws Exception {
     clearAccessToken();
-    createProduct(validParams()).andExpect(status().isForbidden());
+    createProduct(CreateProductParams.sample()).andExpect(status().isForbidden());
   }
 
   @Test
@@ -162,7 +162,7 @@ class SpringSimpleBackendApplicationTests {
             post("/products")
                 .contentType("application/json")
                 .header("Authorization", "NotBearer " + accessToken.orElseThrow())
-                .content(validParams().toContent()))
+                .content(CreateProductParams.sample().toContent()))
         .andExpect(status().isForbidden());
 
     mockMvc
@@ -170,7 +170,7 @@ class SpringSimpleBackendApplicationTests {
             post("/products")
                 .contentType("application/json")
                 .header("Authorization", "Bearer ")
-                .content(validParams().toContent()))
+                .content(CreateProductParams.sample().toContent()))
         .andExpect(status().isForbidden());
   }
 
@@ -178,7 +178,7 @@ class SpringSimpleBackendApplicationTests {
   public void shouldCreateProductWithUserIdSameAsCreator() throws Exception {
     String userId = useNewUserAccessToken();
 
-    CreateProductParams params = validParams();
+    CreateProductParams params = CreateProductParams.sample();
     createProduct(params)
         .andExpect(status().isCreated())
         .andExpect(jsonPath("$.userId").value(userId));
@@ -188,6 +188,10 @@ class SpringSimpleBackendApplicationTests {
     String name;
     double price;
     int quantity;
+
+    private static CreateProductParams sample() {
+      return new CreateProductParams("Product 1", 1.0, 50);
+    }
 
     private CreateProductParams(String name, double price, int quantity) {
       this.name = name;
@@ -204,10 +208,6 @@ class SpringSimpleBackendApplicationTests {
           + this.quantity
           + "}";
     }
-  }
-
-  private CreateProductParams validParams() {
-    return new CreateProductParams("Product 1", 1.0, 50);
   }
 
   private ResultActions createProduct(CreateProductParams params) throws Exception {
@@ -227,6 +227,10 @@ class SpringSimpleBackendApplicationTests {
     String username;
     String password;
 
+    private static UserCredentials sample() {
+      return new UserCredentials("sample-user", "sample-password");
+    }
+
     private UserCredentials(String username, String password) {
       this.username = username;
       this.password = password;
@@ -235,10 +239,6 @@ class SpringSimpleBackendApplicationTests {
     public String toContent() {
       return "{\"username\": \"" + this.username + "\", \"password\": \"" + this.password + "\"}";
     }
-  }
-
-  private UserCredentials sampleUserCredentials() {
-    return new UserCredentials("sample-user", "sample-password");
   }
 
   private ResultActions signup(UserCredentials userCredentials) throws Exception {
