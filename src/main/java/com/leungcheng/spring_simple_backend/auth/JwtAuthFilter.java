@@ -7,6 +7,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,19 +24,30 @@ public class JwtAuthFilter extends OncePerRequestFilter {
       HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws ServletException, IOException {
     String authHeader = request.getHeader("Authorization");
-
-    if (authHeader != null
-        && authHeader.startsWith("Bearer ")
-        && SecurityContextHolder.getContext().getAuthentication() == null) {
-      String accessToken = authHeader.substring(7);
-      JwtService.UserInfo userInfo = jwtService.parseAccessToken(accessToken);
-
-      UserInfoAuthenticationToken authToken = new UserInfoAuthenticationToken(userInfo);
-      SecurityContext context = SecurityContextHolder.createEmptyContext();
-      context.setAuthentication(authToken);
-      SecurityContextHolder.setContext(context);
-    }
+    getAccessToken(authHeader)
+        .ifPresent(
+            accessToken -> {
+              if (SecurityContextHolder.getContext().getAuthentication() == null) {
+                UserInfoAuthenticationToken authToken =
+                    new UserInfoAuthenticationToken(jwtService.parseAccessToken(accessToken));
+                SecurityContext context = SecurityContextHolder.createEmptyContext();
+                context.setAuthentication(authToken);
+                SecurityContextHolder.setContext(context);
+              }
+            });
 
     filterChain.doFilter(request, response);
+  }
+
+  private Optional<String> getAccessToken(String authHeader) {
+    if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+      return Optional.empty();
+    }
+
+    String token = authHeader.substring(7);
+    if (token.isEmpty()) {
+      return Optional.empty();
+    }
+    return Optional.of(token);
   }
 }

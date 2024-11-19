@@ -154,6 +154,27 @@ class SpringSimpleBackendApplicationTests {
   }
 
   @Test
+  public void shouldRejectIfAuthHeaderIsNotSetCorrectly() throws Exception {
+    useNewUserAccessToken();
+
+    mockMvc
+        .perform(
+            post("/products")
+                .contentType("application/json")
+                .header("Authorization", "NotBearer " + accessToken.orElseThrow())
+                .content("{\"name\": \"Product 1\", \"price\": 1.0, \"quantity\": 50}"))
+        .andExpect(status().isForbidden());
+
+    mockMvc
+        .perform(
+            post("/products")
+                .contentType("application/json")
+                .header("Authorization", "Bearer ")
+                .content("{\"name\": \"Product 1\", \"price\": 1.0, \"quantity\": 50}"))
+        .andExpect(status().isForbidden());
+  }
+
+  @Test
   public void shouldCreateProductWithUserIdSameAsCreator() throws Exception {
     String userId = useNewUserAccessToken();
 
