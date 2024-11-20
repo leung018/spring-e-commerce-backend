@@ -14,7 +14,7 @@ class ExceptionHandlerAdvice {
   }
 
   @ExceptionHandler(UsernameAlreadyExistsException.class)
-  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  @ResponseStatus(HttpStatus.CONFLICT)
   String usernameAlreadyExistsHandler(UsernameAlreadyExistsException ex) {
     return ex.getMessage();
   }

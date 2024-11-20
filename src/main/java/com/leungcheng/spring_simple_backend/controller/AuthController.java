@@ -5,6 +5,7 @@ import com.leungcheng.spring_simple_backend.domain.User;
 import com.leungcheng.spring_simple_backend.domain.UserRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,14 +26,14 @@ public class AuthController {
   @PostMapping("/signup")
   @ResponseStatus(HttpStatus.CREATED)
   public void signup(@Valid @RequestBody AuthController.UserCredentials userCredentials) {
-    if (this.userRepository.findByUsername(userCredentials.username()).isPresent()) {
-      throw new UsernameAlreadyExistsException(userCredentials.username());
-    }
-
     String hashedPassword = passwordEncoder.encode(userCredentials.password());
     User user =
         new User.Builder().username(userCredentials.username()).password(hashedPassword).build();
-    this.userRepository.save(user);
+    try {
+      this.userRepository.save(user);
+    } catch (DataIntegrityViolationException e) {
+      throw new UsernameAlreadyExistsException(userCredentials.username());
+    }
   }
 
   @PostMapping("/login")

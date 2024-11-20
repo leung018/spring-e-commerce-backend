@@ -131,7 +131,7 @@ class SpringSimpleBackendApplicationTests {
 
     UserCredentials otherUserCredentials = new UserCredentials("user", "password2");
     signup(otherUserCredentials)
-        .andExpect(status().isBadRequest())
+        .andExpect(status().isConflict())
         .andExpect(content().string("Username user already exists"));
     login(otherUserCredentials).andExpect(status().isForbidden());
   }
