@@ -1,37 +1,30 @@
 package com.leungcheng.spring_simple_backend.domain;
 
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.MacAlgorithm;
+import java.nio.charset.StandardCharsets;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 
 public class JwtService {
   public record UserInfo(String userId) {}
 
-  public record Config(SecretKey secretKey, MacAlgorithm algorithm) {
-    public static Config sample() {
-      MacAlgorithm alg = Jwts.SIG.HS256;
-      SecretKey key = alg.key().build();
-      return new Config(key, alg);
-    }
-  }
-
-  private final Config config;
+  public record Config(String hs256Key) {}
 
   public JwtService(Config config) {
-    this.config = config;
+    byte[] keyBytes = config.hs256Key().getBytes(StandardCharsets.UTF_8);
+    secretKey = new SecretKeySpec(keyBytes, "HmacSHA256");
   }
 
+  private final SecretKey secretKey;
+
   public String generateAccessToken(User user) {
-    return Jwts.builder()
-        .subject(user.getId())
-        .signWith(config.secretKey(), Jwts.SIG.HS256)
-        .compact();
+    return Jwts.builder().subject(user.getId()).signWith(this.secretKey, Jwts.SIG.HS256).compact();
   }
 
   public UserInfo parseAccessToken(String token) {
     String userId =
         Jwts.parser()
-            .verifyWith(config.secretKey())
+            .verifyWith(this.secretKey)
             .build()
             .parseSignedClaims(token)
             .getPayload()
