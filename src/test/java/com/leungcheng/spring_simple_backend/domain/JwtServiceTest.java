@@ -74,4 +74,18 @@ public class JwtServiceTest {
             });
     assertEquals("Invalid signature", exception.getMessage());
   }
+
+  @Test
+  void shouldThrowExceptionIfTokenIsInvalid() {
+    JwtService jwtService = new JwtServiceBuilder().build();
+    User user = userBuilder().build();
+
+    JwtService.InvalidTokenException exception =
+        assertThrows(
+            JwtService.InvalidTokenException.class,
+            () -> {
+              jwtService.parseAccessToken("invalid");
+            });
+    assertEquals("Invalid token", exception.getMessage());
+  }
 }
