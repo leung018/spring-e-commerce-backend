@@ -2,6 +2,7 @@ package com.leungcheng.spring_simple_backend.domain;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.SignatureException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
@@ -55,6 +56,9 @@ public class JwtService {
     } catch (Exception e) {
       if (e instanceof ExpiredJwtException) {
         throw new InvalidTokenException("Expired token");
+      }
+      if (e instanceof SignatureException) {
+        throw new InvalidTokenException("Invalid signature");
       }
       throw new InvalidTokenException("Invalid token");
     }

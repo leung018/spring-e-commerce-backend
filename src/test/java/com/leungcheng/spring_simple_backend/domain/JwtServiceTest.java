@@ -13,11 +13,16 @@ public class JwtServiceTest {
   }
 
   private static class JwtServiceBuilder {
-    private final String hs256Key = Jwts.SIG.HS256.key().build().toString();
+    private String hs256Key = Jwts.SIG.HS256.key().build().toString();
     private Duration expiredDuration = Duration.ofHours(1);
 
     private JwtServiceBuilder expiredDuration(Duration expiredDuration) {
       this.expiredDuration = expiredDuration;
+      return this;
+    }
+
+    private JwtServiceBuilder newHs256Key() {
+      this.hs256Key = Jwts.SIG.HS256.key().build().toString();
       return this;
     }
 
@@ -51,5 +56,22 @@ public class JwtServiceTest {
               jwtService.parseAccessToken(token);
             });
     assertEquals("Expired token", exception.getMessage());
+  }
+
+  @Test
+  void shouldThrowExceptionIfTokenIsSignedByDifferentKey() {
+    JwtServiceBuilder builder = new JwtServiceBuilder();
+    JwtService jwtService = builder.build();
+    User user = userBuilder().build();
+
+    String token = jwtService.generateAccessToken(user);
+
+    JwtService.InvalidTokenException exception =
+        assertThrows(
+            JwtService.InvalidTokenException.class,
+            () -> {
+              builder.newHs256Key().build().parseAccessToken(token);
+            });
+    assertEquals("Invalid signature", exception.getMessage());
   }
 }
