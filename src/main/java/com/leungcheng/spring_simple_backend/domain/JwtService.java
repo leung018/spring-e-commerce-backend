@@ -9,11 +9,12 @@ import java.time.Instant;
 import java.util.Date;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
+@Component
 public class JwtService {
   public record UserInfo(String userId) {}
-
-  public record Config(String hs256Key, Duration expiredDuration) {}
 
   public static class InvalidTokenException extends RuntimeException {
     public InvalidTokenException(String message) {
@@ -21,10 +22,12 @@ public class JwtService {
     }
   }
 
-  public JwtService(Config config) {
-    byte[] keyBytes = config.hs256Key().getBytes(StandardCharsets.UTF_8);
+  public JwtService(
+      @Value("${jwt.hs256Key:your-default-key-1234567890abcdef}") String hs256Key,
+      @Value("${jwt.expiredDuration:1h}") Duration expiredDuration) {
+    byte[] keyBytes = hs256Key.getBytes(StandardCharsets.UTF_8);
     secretKey = new SecretKeySpec(keyBytes, "HmacSHA256");
-    expiredDuration = config.expiredDuration();
+    this.expiredDuration = expiredDuration;
   }
 
   private final SecretKey secretKey;

@@ -27,7 +27,7 @@ public class JwtServiceTest {
     }
 
     private JwtService build() {
-      return new JwtService(new JwtService.Config(hs256Key, expiredDuration));
+      return new JwtService(hs256Key, expiredDuration);
     }
   }
 
