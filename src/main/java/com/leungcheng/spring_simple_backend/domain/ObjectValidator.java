@@ -10,6 +10,12 @@ class ObjectValidator {
   private static final ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
   private static final Validator validator = factory.getValidator();
 
+  public static class ObjectValidationException extends IllegalArgumentException {
+    public ObjectValidationException(String message) {
+      super(message);
+    }
+  }
+
   static <T> void validate(T object) {
     Set<ConstraintViolation<T>> violations = validator.validate(object);
     if (!violations.isEmpty()) {
@@ -17,7 +23,7 @@ class ObjectValidator {
       for (ConstraintViolation<T> violation : violations) {
         sb.append(violation.getMessage()).append("\n");
       }
-      throw new IllegalArgumentException("Validation failed:\n" + sb);
+      throw new ObjectValidationException("Validation failed:\n" + sb);
     }
   }
 }

@@ -28,8 +28,9 @@ class ProductTest {
   }
 
   @Test
-  void shouldRaiseExceptionIfViolateTheValidationConstraints() {
-    Class<IllegalArgumentException> expected = IllegalArgumentException.class;
+  void shouldRaiseExceptionWhenBuildingIfParamsViolateTheValidationConstraints() {
+    Class<ObjectValidator.ObjectValidationException> expected =
+        ObjectValidator.ObjectValidationException.class;
     assertThrows(
         expected,
         () -> {
