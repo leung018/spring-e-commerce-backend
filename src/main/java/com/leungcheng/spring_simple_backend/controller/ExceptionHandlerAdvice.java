@@ -1,5 +1,6 @@
 package com.leungcheng.spring_simple_backend.controller;
 
+import com.leungcheng.spring_simple_backend.domain.ObjectValidator.ObjectValidationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -19,7 +20,7 @@ class ExceptionHandlerAdvice {
     return ex.getMessage();
   }
 
-  @ExceptionHandler(IllegalArgumentException.class) // TODO: use more specific exception
+  @ExceptionHandler(ObjectValidationException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   String illegalArgumentHandler(IllegalArgumentException ex) {
     return ex.getMessage();
