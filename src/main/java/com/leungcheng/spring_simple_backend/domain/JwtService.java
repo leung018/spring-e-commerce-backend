@@ -23,8 +23,8 @@ public class JwtService {
   }
 
   public JwtService(
-      @Value("${jwt.hs256Key:your-default-key-1234567890abcdef}") String hs256Key,
-      @Value("${jwt.expiredDuration:1h}") Duration expiredDuration) {
+      @Value("${jwt.hs256Key}") String hs256Key,
+      @Value("${jwt.expiredDuration}") Duration expiredDuration) {
     byte[] keyBytes = hs256Key.getBytes(StandardCharsets.UTF_8);
     secretKey = new SecretKeySpec(keyBytes, "HmacSHA256");
     this.expiredDuration = expiredDuration;
