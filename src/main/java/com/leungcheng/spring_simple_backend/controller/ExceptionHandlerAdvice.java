@@ -18,4 +18,10 @@ class ExceptionHandlerAdvice {
   String usernameAlreadyExistsHandler(UsernameAlreadyExistsException ex) {
     return ex.getMessage();
   }
+
+  @ExceptionHandler(IllegalArgumentException.class) // TODO: use more specific exception
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  String illegalArgumentHandler(IllegalArgumentException ex) {
+    return ex.getMessage();
+  }
 }
