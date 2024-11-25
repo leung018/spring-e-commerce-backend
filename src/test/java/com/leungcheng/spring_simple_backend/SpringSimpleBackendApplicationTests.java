@@ -1,13 +1,10 @@
 package com.leungcheng.spring_simple_backend;
 
 import static org.hamcrest.Matchers.not;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.jayway.jsonpath.JsonPath;
-import com.leungcheng.spring_simple_backend.domain.JwtService;
 import com.leungcheng.spring_simple_backend.domain.ProductRepository;
 import com.leungcheng.spring_simple_backend.domain.User;
 import com.leungcheng.spring_simple_backend.domain.UserRepository;
@@ -17,7 +14,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
@@ -30,8 +26,6 @@ class SpringSimpleBackendApplicationTests {
   @Autowired private MockMvc mockMvc;
   @Autowired private ProductRepository productRepository;
   @Autowired private UserRepository userRepository;
-
-  @MockBean private JwtService jwtService;
 
   private Optional<String> accessToken = Optional.empty();
 
@@ -54,11 +48,6 @@ class SpringSimpleBackendApplicationTests {
 
     signup(userCredentials).andExpect(status().isCreated());
     User user = userRepository.findByUsername(userCredentials.username).orElseThrow();
-
-    when(jwtService.generateAccessToken(argThat(argument -> argument.getId().equals(user.getId()))))
-        .thenReturn("dummy-token");
-    when(jwtService.parseAccessToken("dummy-token"))
-        .thenReturn(new JwtService.UserInfo(user.getId()));
 
     MvcResult result = login(userCredentials).andExpect(status().isOk()).andReturn();
     String token = JsonPath.read(result.getResponse().getContentAsString(), "$.accessToken");
