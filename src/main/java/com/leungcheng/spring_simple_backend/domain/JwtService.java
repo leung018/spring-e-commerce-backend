@@ -46,6 +46,10 @@ public class JwtService {
         .compact();
   }
 
+  /**
+   * @throws InvalidTokenException if token is invalid due to expiration, invalid signature, or
+   *     other reasons
+   */
   public UserInfo parseAccessToken(String token) {
     try {
       String userId =
