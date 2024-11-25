@@ -1,8 +1,9 @@
-package com.leungcheng.spring_simple_backend.domain;
+package com.leungcheng.spring_simple_backend.auth;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.leungcheng.spring_simple_backend.domain.User;
 import io.jsonwebtoken.Jwts;
 import java.time.Duration;
 import org.junit.jupiter.api.Test;

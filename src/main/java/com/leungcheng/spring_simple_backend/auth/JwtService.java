@@ -1,5 +1,6 @@
-package com.leungcheng.spring_simple_backend.domain;
+package com.leungcheng.spring_simple_backend.auth;
 
+import com.leungcheng.spring_simple_backend.domain.User;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.SignatureException;

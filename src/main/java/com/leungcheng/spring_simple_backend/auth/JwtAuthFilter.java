@@ -1,6 +1,5 @@
 package com.leungcheng.spring_simple_backend.auth;
 
-import com.leungcheng.spring_simple_backend.domain.JwtService;
 import com.leungcheng.spring_simple_backend.domain.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
