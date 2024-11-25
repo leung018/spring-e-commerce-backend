@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 class ProductTest {
 
   private static Product.Builder productBuilder() {
-    return new Product.Builder().name("Default Product").price(2.0).quantity(3);
+    return new Product.Builder().name("Default Product").price(0).quantity(0);
   }
 
   @Test
@@ -45,14 +45,6 @@ class ProductTest {
         expected,
         () -> {
           productBuilder().name("").build();
-        });
-  }
-
-  @Test
-  void shouldNotRaiseExceptionIfZero() {
-    assertDoesNotThrow(
-        () -> {
-          productBuilder().quantity(0).price(0).build();
         });
   }
 }
