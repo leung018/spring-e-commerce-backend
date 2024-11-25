@@ -143,6 +143,12 @@ class SpringSimpleBackendApplicationTests {
   }
 
   @Test
+  public void shouldRejectIfApiCallWithInvalidToken() throws Exception {
+    setAccessToken("invalid-token");
+    createProduct(CreateProductParams.sample()).andExpect(status().isForbidden());
+  }
+
+  @Test
   public void shouldRejectIfAuthHeaderIsNotSetCorrectly() throws Exception {
     useNewUserAccessToken();
 
