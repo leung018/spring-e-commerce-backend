@@ -1,6 +1,5 @@
 package com.leungcheng.spring_simple_backend.auth;
 
-import com.leungcheng.spring_simple_backend.domain.JwtService;
 import com.leungcheng.spring_simple_backend.domain.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -28,11 +27,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         .ifPresent(
             accessToken -> {
               if (SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserInfoAuthenticationToken authToken =
-                    new UserInfoAuthenticationToken(jwtService.parseAccessToken(accessToken));
-                SecurityContext context = SecurityContextHolder.createEmptyContext();
-                context.setAuthentication(authToken);
-                SecurityContextHolder.setContext(context);
+                try {
+                  UserInfoAuthenticationToken authToken =
+                      new UserInfoAuthenticationToken(jwtService.parseAccessToken(accessToken));
+                  SecurityContext context = SecurityContextHolder.createEmptyContext();
+                  context.setAuthentication(authToken);
+                  SecurityContextHolder.setContext(context);
+                } catch (JwtService.InvalidTokenException e) {
+                  response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                }
               }
             });
 

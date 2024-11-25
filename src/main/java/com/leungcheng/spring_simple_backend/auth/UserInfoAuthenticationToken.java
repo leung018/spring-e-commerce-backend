@@ -1,6 +1,6 @@
 package com.leungcheng.spring_simple_backend.auth;
 
-import com.leungcheng.spring_simple_backend.domain.JwtService.UserInfo;
+import com.leungcheng.spring_simple_backend.auth.JwtService.UserInfo;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 
 public class UserInfoAuthenticationToken extends AbstractAuthenticationToken {

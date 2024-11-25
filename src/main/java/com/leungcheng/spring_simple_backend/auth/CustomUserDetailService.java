@@ -1,5 +1,6 @@
-package com.leungcheng.spring_simple_backend.domain;
+package com.leungcheng.spring_simple_backend.auth;
 
+import com.leungcheng.spring_simple_backend.domain.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

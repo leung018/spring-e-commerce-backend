@@ -1,6 +1,6 @@
 package com.leungcheng.spring_simple_backend.controller;
 
-import com.leungcheng.spring_simple_backend.domain.JwtService;
+import com.leungcheng.spring_simple_backend.auth.JwtService;
 import com.leungcheng.spring_simple_backend.domain.User;
 import com.leungcheng.spring_simple_backend.domain.UserRepository;
 import jakarta.validation.Valid;
