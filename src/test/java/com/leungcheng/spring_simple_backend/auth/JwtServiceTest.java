@@ -38,9 +38,9 @@ public class JwtServiceTest {
     User user = userBuilder().build();
 
     String token = jwtService.generateAccessToken(user);
-    JwtService.UserInfo userInfo = jwtService.parseAccessToken(token);
+    UserAuthenticatedInfo userAuthenticatedInfo = jwtService.parseAccessToken(token);
 
-    assertEquals(user.getId(), userInfo.userId());
+    assertEquals(user.getId(), userAuthenticatedInfo.userId());
   }
 
   @Test

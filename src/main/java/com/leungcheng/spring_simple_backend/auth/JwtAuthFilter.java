@@ -15,6 +15,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
+
   @Autowired private JwtService jwtService;
   @Autowired private UserRepository userRepository;
 
@@ -28,8 +29,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             accessToken -> {
               if (SecurityContextHolder.getContext().getAuthentication() == null) {
                 try {
-                  UserInfoAuthenticationToken authToken =
-                      new UserInfoAuthenticationToken(jwtService.parseAccessToken(accessToken));
+                  UserAuthenticatedInfoToken authToken =
+                      new UserAuthenticatedInfoToken(jwtService.parseAccessToken(accessToken));
                   SecurityContext context = SecurityContextHolder.createEmptyContext();
                   context.setAuthentication(authToken);
                   SecurityContextHolder.setContext(context);

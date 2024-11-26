@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class JwtService {
-  public record UserInfo(String userId) {}
 
   public static class InvalidTokenException extends RuntimeException {
     public InvalidTokenException(String message) {
@@ -51,7 +50,7 @@ public class JwtService {
    * @throws InvalidTokenException if token is invalid due to expiration, invalid signature, or
    *     other reasons
    */
-  public UserInfo parseAccessToken(String token) {
+  public UserAuthenticatedInfo parseAccessToken(String token) {
     try {
       String userId =
           Jwts.parser()
@@ -60,7 +59,7 @@ public class JwtService {
               .parseSignedClaims(token)
               .getPayload()
               .getSubject();
-      return new UserInfo(userId);
+      return new UserAuthenticatedInfo(userId);
     } catch (Exception e) {
       if (e instanceof ExpiredJwtException) {
         throw new InvalidTokenException("Expired token");
