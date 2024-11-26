@@ -28,7 +28,7 @@ class ProductTest {
   }
 
   @Test
-  void shouldRaiseExceptionWhenBuildingIfParamsViolateTheValidationConstraints() {
+  void shouldRaiseExceptionWhenBuild_IfParamsViolateTheValidationConstraints() {
     Class<ObjectValidator.ObjectValidationException> expected =
         ObjectValidator.ObjectValidationException.class;
     assertThrows(
