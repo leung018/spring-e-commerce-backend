@@ -8,10 +8,11 @@ import jakarta.validation.constraints.NotBlank;
 
 @Entity
 public class Product {
-  static class Builder {
+  public static class Builder {
     private String name;
     private double price;
     private int quantity;
+    private String userId;
 
     public Builder name(String name) {
       this.name = name;
@@ -28,11 +29,17 @@ public class Product {
       return this;
     }
 
+    public Builder userId(String userId) {
+      this.userId = userId;
+      return this;
+    }
+
     public Product build() {
       Product product = new Product();
       product.name = name;
       product.price = price;
       product.quantity = quantity;
+      product.userId = userId;
       ObjectValidator.validate(product);
 
       return product;
@@ -60,11 +67,6 @@ public class Product {
   }
 
   public String getUserId() {
-    return userId;
-  }
-
-  public String setUserId(String userId) {
-    this.userId = userId;
     return userId;
   }
 

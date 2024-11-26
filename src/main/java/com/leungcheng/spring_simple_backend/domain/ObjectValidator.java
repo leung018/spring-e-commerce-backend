@@ -6,9 +6,15 @@ import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import java.util.Set;
 
-class ObjectValidator {
+public class ObjectValidator {
   private static final ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
   private static final Validator validator = factory.getValidator();
+
+  public static class ObjectValidationException extends IllegalArgumentException {
+    public ObjectValidationException(String message) {
+      super(message);
+    }
+  }
 
   static <T> void validate(T object) {
     Set<ConstraintViolation<T>> violations = validator.validate(object);
@@ -17,7 +23,7 @@ class ObjectValidator {
       for (ConstraintViolation<T> violation : violations) {
         sb.append(violation.getMessage()).append("\n");
       }
-      throw new IllegalArgumentException("Validation failed:\n" + sb);
+      throw new ObjectValidationException("Validation failed:\n" + sb);
     }
   }
 }

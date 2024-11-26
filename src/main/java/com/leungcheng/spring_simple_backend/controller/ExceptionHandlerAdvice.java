@@ -1,5 +1,6 @@
 package com.leungcheng.spring_simple_backend.controller;
 
+import com.leungcheng.spring_simple_backend.domain.ObjectValidator.ObjectValidationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -16,6 +17,12 @@ class ExceptionHandlerAdvice {
   @ExceptionHandler(UsernameAlreadyExistsException.class)
   @ResponseStatus(HttpStatus.CONFLICT)
   String usernameAlreadyExistsHandler(UsernameAlreadyExistsException ex) {
+    return ex.getMessage();
+  }
+
+  @ExceptionHandler(ObjectValidationException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  String illegalArgumentHandler(IllegalArgumentException ex) {
     return ex.getMessage();
   }
 }

@@ -14,9 +14,17 @@ public class ProductController {
 
   @PostMapping("/products")
   @ResponseStatus(HttpStatus.CREATED)
-  Product newProduct(@Valid @RequestBody Product product, UserInfoAuthenticationToken authToken) {
+  Product newProduct(
+      @Valid @RequestBody CreateProductRequest createProductRequest,
+      UserInfoAuthenticationToken authToken) {
     String userId = authToken.getPrincipal();
-    product.setUserId(userId);
+    Product product =
+        new Product.Builder()
+            .name(createProductRequest.name())
+            .price(createProductRequest.price())
+            .quantity(createProductRequest.quantity())
+            .userId(userId)
+            .build();
     return repository.save(product);
   }
 
@@ -24,4 +32,6 @@ public class ProductController {
   Product one(@PathVariable String id) {
     return repository.findById(id).orElseThrow(() -> new ProductNotFoundException(id));
   }
+
+  public record CreateProductRequest(String name, double price, int quantity) {}
 }
