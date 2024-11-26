@@ -1,6 +1,6 @@
 package com.leungcheng.spring_simple_backend.controller;
 
-import com.leungcheng.spring_simple_backend.auth.UserInfoAuthenticationToken;
+import com.leungcheng.spring_simple_backend.auth.UserAuthenticatedInfoToken;
 import com.leungcheng.spring_simple_backend.domain.Product;
 import com.leungcheng.spring_simple_backend.domain.ProductRepository;
 import jakarta.validation.Valid;
@@ -16,7 +16,7 @@ public class ProductController {
   @ResponseStatus(HttpStatus.CREATED)
   Product newProduct(
       @Valid @RequestBody CreateProductRequest createProductRequest,
-      UserInfoAuthenticationToken authToken) {
+      UserAuthenticatedInfoToken authToken) {
     String userId = authToken.getPrincipal();
     Product product =
         new Product.Builder()
