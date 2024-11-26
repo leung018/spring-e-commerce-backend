@@ -6,6 +6,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import java.util.Collection;
 import java.util.List;
 import org.springframework.security.core.GrantedAuthority;
@@ -55,9 +57,11 @@ public class User implements UserDetails {
   private double balance;
 
   @Column(unique = true)
+  @Size(min = 5, max = 20)
+  @NoSpaces
   private String username;
 
-  private String password;
+  @NotBlank private String password;
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -6,14 +6,14 @@ import org.junit.jupiter.api.Test;
 
 class UserTest {
   private static User.Builder userBuilder() {
-    return new User.Builder().username("Default User").password("default_password").balance(0);
+    return new User.Builder().username("default_user").password("default_password").balance(0);
   }
 
   @Test
   void shouldCreateUser() {
-    User user = userBuilder().username("User 1").password("password").balance(100).build();
+    User user = userBuilder().username("user_1").password("password").balance(100).build();
 
-    assertEquals("User 1", user.getUsername());
+    assertEquals("user_1", user.getUsername());
     assertEquals("password", user.getPassword());
     assertEquals(100, user.getBalance());
   }
@@ -24,5 +24,22 @@ class UserTest {
     User user2 = userBuilder().build();
 
     assertNotEquals(user1.getId(), user2.getId());
+  }
+
+  @Test
+  void shouldRaiseExceptionWhenBuild_IfParamsViolateTheValidationConstraints() {
+    assertThrowValidationException(userBuilder().balance(-1));
+
+    assertThrowValidationException(userBuilder().username("1".repeat(4))); // min characters
+    assertThrowValidationException(userBuilder().username("1".repeat(21))); // max characters
+    assertThrowValidationException(userBuilder().username("i have space"));
+
+    assertThrowValidationException(userBuilder().password(null));
+  }
+
+  private void assertThrowValidationException(User.Builder builder) {
+    Class<ObjectValidator.ObjectValidationException> expected =
+        ObjectValidator.ObjectValidationException.class;
+    assertThrows(expected, builder::build);
   }
 }
