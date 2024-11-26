@@ -68,6 +68,10 @@ public class User implements UserDetails {
     return id;
   }
 
+  public double getBalance() {
+    return balance;
+  }
+
   @Override
   public String getPassword() {
     return password;
