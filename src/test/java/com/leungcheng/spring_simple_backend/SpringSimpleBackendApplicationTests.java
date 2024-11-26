@@ -116,19 +116,19 @@ class SpringSimpleBackendApplicationTests {
 
   @Test
   public void shouldRejectSignupWhenUsernameExists() throws Exception {
-    signup(new UserCredentials("user", "password")).andExpect(status().isCreated());
+    signup(new UserCredentials("user01", "password")).andExpect(status().isCreated());
 
-    UserCredentials otherUserCredentials = new UserCredentials("user", "password2");
+    UserCredentials otherUserCredentials = new UserCredentials("user01", "password2");
     signup(otherUserCredentials)
         .andExpect(status().isConflict())
-        .andExpect(content().string("Username user already exists"));
+        .andExpect(content().string("Username user01 already exists"));
     login(otherUserCredentials).andExpect(status().isForbidden());
   }
 
   @Test
   public void shouldRejectLoginWithIncorrectPassword() throws Exception {
-    signup(new UserCredentials("user", "password")).andExpect(status().isCreated());
-    login(new UserCredentials("user", "invalid")).andExpect(status().isForbidden());
+    signup(new UserCredentials("user01", "password")).andExpect(status().isCreated());
+    login(new UserCredentials("user01", "invalid")).andExpect(status().isForbidden());
   }
 
   @Test
