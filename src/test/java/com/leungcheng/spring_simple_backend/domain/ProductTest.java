@@ -2,6 +2,7 @@ package com.leungcheng.spring_simple_backend.domain;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.leungcheng.spring_simple_backend.validation.ObjectValidator;
 import org.junit.jupiter.api.Test;
 
 class ProductTest {

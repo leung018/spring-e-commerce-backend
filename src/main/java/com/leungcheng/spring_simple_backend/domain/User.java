@@ -1,6 +1,7 @@
 package com.leungcheng.spring_simple_backend.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.leungcheng.spring_simple_backend.validation.ObjectValidator;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;

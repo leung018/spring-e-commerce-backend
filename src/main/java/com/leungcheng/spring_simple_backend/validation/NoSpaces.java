@@ -1,4 +1,4 @@
-package com.leungcheng.spring_simple_backend.domain;
+package com.leungcheng.spring_simple_backend.validation;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.ConstraintValidator;
