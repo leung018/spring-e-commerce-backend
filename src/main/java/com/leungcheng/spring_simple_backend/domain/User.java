@@ -5,7 +5,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import java.util.Collection;
@@ -17,14 +16,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Table(name = "users")
 public class User implements UserDetails {
   public static class Builder {
-    private double balance = 0;
     private String username;
     private String password;
-
-    public Builder balance(double balance) {
-      this.balance = balance;
-      return this;
-    }
 
     public Builder username(String username) {
       this.username = username;
@@ -38,7 +31,6 @@ public class User implements UserDetails {
 
     public User build() {
       User user = new User();
-      user.balance = balance;
       user.username = username;
       user.password = password;
       ObjectValidator.validate(user);
@@ -52,9 +44,6 @@ public class User implements UserDetails {
   @Id
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   private String id = java.util.UUID.randomUUID().toString();
-
-  @Min(0)
-  private double balance;
 
   @Column(unique = true)
   @Size(min = 5, max = 20)
@@ -70,10 +59,6 @@ public class User implements UserDetails {
 
   public String getId() {
     return id;
-  }
-
-  public double getBalance() {
-    return balance;
   }
 
   @Override

@@ -6,16 +6,15 @@ import org.junit.jupiter.api.Test;
 
 class UserTest {
   private static User.Builder userBuilder() {
-    return new User.Builder().username("default_user").password("default_password").balance(0);
+    return new User.Builder().username("default_user").password("default_password");
   }
 
   @Test
   void shouldCreateUser() {
-    User user = userBuilder().username("user_1").password("password").balance(100).build();
+    User user = userBuilder().username("user_1").password("password").build();
 
     assertEquals("user_1", user.getUsername());
     assertEquals("password", user.getPassword());
-    assertEquals(100, user.getBalance());
   }
 
   @Test
@@ -28,8 +27,6 @@ class UserTest {
 
   @Test
   void shouldRaiseExceptionWhenBuild_IfParamsViolateTheValidationConstraints() {
-    assertThrowValidationException(userBuilder().balance(-1));
-
     assertThrowValidationException(userBuilder().username("1".repeat(4))); // min characters
     assertThrowValidationException(userBuilder().username("1".repeat(21))); // max characters
     assertThrowValidationException(userBuilder().username("i have space"));
