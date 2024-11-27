@@ -115,25 +115,52 @@ class SpringSimpleBackendApplicationTests {
   }
 
   @Test
-  public void shouldRejectSignupWhenUsernameExists() throws Exception {
-    signup(new UserCredentials("user", "password")).andExpect(status().isCreated());
+  public void shouldRejectSignupWithInvalidUsername() throws Exception {
+    assertSignupRejectUsername("1".repeat(4));
+    assertSignupRejectUsername("1".repeat(21));
+    assertSignupRejectUsername("NonLowerCase");
+    assertSignupRejectUsername("non-alphanumeric&3");
+  }
 
-    UserCredentials otherUserCredentials = new UserCredentials("user", "password2");
+  private void assertSignupRejectUsername(String username) throws Exception {
+    UserCredentials userCredentials = UserCredentials.sample();
+    userCredentials.username = username;
+    signup(userCredentials).andExpect(status().isBadRequest());
+  }
+
+  @Test
+  public void shouldRejectSignupWithInvalidPassword() throws Exception {
+    assertSignupRejectPassword("1".repeat(7));
+    assertSignupRejectPassword("1".repeat(51));
+    assertSignupRejectPassword("i have space");
+  }
+
+  private void assertSignupRejectPassword(String password) throws Exception {
+    UserCredentials userCredentials = UserCredentials.sample();
+    userCredentials.password = password;
+    signup(userCredentials).andExpect(status().isBadRequest());
+  }
+
+  @Test
+  public void shouldRejectSignupWhenUsernameExists() throws Exception {
+    signup(new UserCredentials("user01", "password")).andExpect(status().isCreated());
+
+    UserCredentials otherUserCredentials = new UserCredentials("user01", "password2");
     signup(otherUserCredentials)
         .andExpect(status().isConflict())
-        .andExpect(content().string("Username user already exists"));
+        .andExpect(content().string("Username user01 already exists"));
     login(otherUserCredentials).andExpect(status().isForbidden());
   }
 
   @Test
   public void shouldRejectLoginWithIncorrectPassword() throws Exception {
-    signup(new UserCredentials("user", "password")).andExpect(status().isCreated());
-    login(new UserCredentials("user", "invalid")).andExpect(status().isForbidden());
+    signup(new UserCredentials("user01", "password")).andExpect(status().isCreated());
+    login(new UserCredentials("user01", "password2")).andExpect(status().isForbidden());
   }
 
   @Test
   public void shouldRejectLoginWithNonexistentUsername() throws Exception {
-    login(new UserCredentials("nonexistent-user", "password")).andExpect(status().isForbidden());
+    login(new UserCredentials("nonexistentuser", "password")).andExpect(status().isForbidden());
   }
 
   @Test
@@ -223,7 +250,7 @@ class SpringSimpleBackendApplicationTests {
     String password;
 
     private static UserCredentials sample() {
-      return new UserCredentials("sample-user", "sample-password");
+      return new UserCredentials("user001", "sample-password");
     }
 
     private UserCredentials(String username, String password) {

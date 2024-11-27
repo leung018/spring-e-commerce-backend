@@ -1,4 +1,4 @@
-package com.leungcheng.spring_simple_backend.domain;
+package com.leungcheng.spring_simple_backend.validation;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
@@ -16,7 +16,7 @@ public class ObjectValidator {
     }
   }
 
-  static <T> void validate(T object) {
+  public static <T> void validate(T object) {
     Set<ConstraintViolation<T>> violations = validator.validate(object);
     if (!violations.isEmpty()) {
       StringBuilder sb = new StringBuilder();
