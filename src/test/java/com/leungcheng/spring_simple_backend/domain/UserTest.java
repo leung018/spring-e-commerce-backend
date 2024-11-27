@@ -27,11 +27,11 @@ class UserTest {
 
   @Test
   void shouldRaiseExceptionWhenBuild_IfParamsViolateTheValidationConstraints() {
-    assertThrowValidationException(userBuilder().username("1".repeat(4))); // min characters
-    assertThrowValidationException(userBuilder().username("1".repeat(21))); // max characters
-    assertThrowValidationException(userBuilder().username("i have space"));
+    assertThrowValidationException(userBuilder().username(null));
+    assertThrowValidationException(userBuilder().username(""));
 
     assertThrowValidationException(userBuilder().password(null));
+    assertThrowValidationException(userBuilder().password(""));
   }
 
   private void assertThrowValidationException(User.Builder builder) {

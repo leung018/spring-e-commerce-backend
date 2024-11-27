@@ -115,6 +115,31 @@ class SpringSimpleBackendApplicationTests {
   }
 
   @Test
+  public void shouldRejectSignupWithInvalidData() throws Exception {
+    // username
+    UserCredentials userCredentials = UserCredentials.sample();
+    userCredentials.username = "1".repeat(4);
+    signup(userCredentials).andExpect(status().isBadRequest());
+
+    userCredentials = UserCredentials.sample();
+    userCredentials.username = "1".repeat(21);
+    signup(userCredentials).andExpect(status().isBadRequest());
+
+    // password
+    userCredentials = UserCredentials.sample();
+    userCredentials.password = "1".repeat(7);
+    signup(userCredentials).andExpect(status().isBadRequest());
+
+    userCredentials = UserCredentials.sample();
+    userCredentials.password = "1".repeat(51);
+    signup(userCredentials).andExpect(status().isBadRequest());
+
+    userCredentials = UserCredentials.sample();
+    userCredentials.password = "i have space";
+    signup(userCredentials).andExpect(status().isBadRequest());
+  }
+
+  @Test
   public void shouldRejectSignupWhenUsernameExists() throws Exception {
     signup(new UserCredentials("user01", "password")).andExpect(status().isCreated());
 
@@ -128,7 +153,7 @@ class SpringSimpleBackendApplicationTests {
   @Test
   public void shouldRejectLoginWithIncorrectPassword() throws Exception {
     signup(new UserCredentials("user01", "password")).andExpect(status().isCreated());
-    login(new UserCredentials("user01", "invalid")).andExpect(status().isForbidden());
+    login(new UserCredentials("user01", "password2")).andExpect(status().isForbidden());
   }
 
   @Test
