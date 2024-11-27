@@ -30,22 +30,16 @@ class ProductTest {
 
   @Test
   void shouldRaiseExceptionWhenBuild_IfParamsViolateTheValidationConstraints() {
+    assertThrowValidationException(productBuilder().quantity(-1));
+
+    assertThrowValidationException(productBuilder().price(-1));
+
+    assertThrowValidationException(productBuilder().name(""));
+  }
+
+  private void assertThrowValidationException(Product.Builder builder) {
     Class<ObjectValidator.ObjectValidationException> expected =
         ObjectValidator.ObjectValidationException.class;
-    assertThrows(
-        expected,
-        () -> {
-          productBuilder().quantity(-1).build();
-        });
-    assertThrows(
-        expected,
-        () -> {
-          productBuilder().price(-1).build();
-        });
-    assertThrows(
-        expected,
-        () -> {
-          productBuilder().name("").build();
-        });
+    assertThrows(expected, builder::build);
   }
 }
