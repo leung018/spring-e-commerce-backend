@@ -35,6 +35,7 @@ class ProductTest {
     assertThrowValidationException(productBuilder().price(-1));
 
     assertThrowValidationException(productBuilder().name(""));
+    assertThrowValidationException(productBuilder().name(null));
   }
 
   private void assertThrowValidationException(Product.Builder builder) {
