@@ -57,7 +57,7 @@ class SpringSimpleBackendApplicationTests {
   }
 
   @Test
-  public void shouldCreateAndGetProduct() throws Exception {
+  void shouldCreateAndGetProduct() throws Exception {
     useNewUserAccessToken();
 
     CreateProductParams params = CreateProductParams.sample();
@@ -78,7 +78,7 @@ class SpringSimpleBackendApplicationTests {
   }
 
   @Test
-  public void shouldIgnoreIdWhenCreateProduct() throws Exception {
+  void shouldIgnoreIdWhenCreateProduct() throws Exception {
     useNewUserAccessToken();
 
     mockMvc
@@ -93,7 +93,7 @@ class SpringSimpleBackendApplicationTests {
   }
 
   @Test
-  public void shouldRejectCreateProductWithInvalidData() throws Exception {
+  void shouldRejectCreateProductWithInvalidData() throws Exception {
     useNewUserAccessToken();
 
     CreateProductParams params = CreateProductParams.sample();
@@ -106,7 +106,7 @@ class SpringSimpleBackendApplicationTests {
   }
 
   @Test
-  public void shouldGet404WhenProductNotFound() throws Exception {
+  void shouldGet404WhenProductNotFound() throws Exception {
     useNewUserAccessToken();
 
     getProduct("invalid-id")
@@ -115,7 +115,7 @@ class SpringSimpleBackendApplicationTests {
   }
 
   @Test
-  public void shouldRejectSignupWithInvalidUsername() throws Exception {
+  void shouldRejectSignupWithInvalidUsername() throws Exception {
     assertSignupRejectUsername("1".repeat(4));
     assertSignupRejectUsername("1".repeat(21));
     assertSignupRejectUsername("NonLowerCase");
@@ -129,7 +129,7 @@ class SpringSimpleBackendApplicationTests {
   }
 
   @Test
-  public void shouldRejectSignupWithInvalidPassword() throws Exception {
+  void shouldRejectSignupWithInvalidPassword() throws Exception {
     assertSignupRejectPassword("1".repeat(7));
     assertSignupRejectPassword("1".repeat(51));
     assertSignupRejectPassword("i have space");
@@ -142,7 +142,7 @@ class SpringSimpleBackendApplicationTests {
   }
 
   @Test
-  public void shouldRejectSignupWhenUsernameExists() throws Exception {
+  void shouldRejectSignupWhenUsernameExists() throws Exception {
     signup(new UserCredentials("user01", "password")).andExpect(status().isCreated());
 
     UserCredentials otherUserCredentials = new UserCredentials("user01", "password2");
@@ -153,30 +153,30 @@ class SpringSimpleBackendApplicationTests {
   }
 
   @Test
-  public void shouldRejectLoginWithIncorrectPassword() throws Exception {
+  void shouldRejectLoginWithIncorrectPassword() throws Exception {
     signup(new UserCredentials("user01", "password")).andExpect(status().isCreated());
     login(new UserCredentials("user01", "password2")).andExpect(status().isForbidden());
   }
 
   @Test
-  public void shouldRejectLoginWithNonexistentUsername() throws Exception {
+  void shouldRejectLoginWithNonexistentUsername() throws Exception {
     login(new UserCredentials("nonexistentuser", "password")).andExpect(status().isForbidden());
   }
 
   @Test
-  public void shouldRejectNonAuthApiCallWithoutToken() throws Exception {
+  void shouldRejectNonAuthApiCallWithoutToken() throws Exception {
     clearAccessToken();
     createProduct(CreateProductParams.sample()).andExpect(status().isForbidden());
   }
 
   @Test
-  public void shouldRejectIfApiCallWithInvalidToken() throws Exception {
+  void shouldRejectIfApiCallWithInvalidToken() throws Exception {
     setAccessToken("invalid-token");
     createProduct(CreateProductParams.sample()).andExpect(status().isForbidden());
   }
 
   @Test
-  public void shouldRejectIfAuthHeaderIsNotSetCorrectly() throws Exception {
+  void shouldRejectIfAuthHeaderIsNotSetCorrectly() throws Exception {
     useNewUserAccessToken();
 
     mockMvc
@@ -197,7 +197,7 @@ class SpringSimpleBackendApplicationTests {
   }
 
   @Test
-  public void shouldCreateProductWithUserIdSameAsCreator() throws Exception {
+  void shouldCreateProductWithUserIdSameAsCreator() throws Exception {
     String userId = useNewUserAccessToken();
 
     CreateProductParams params = CreateProductParams.sample();

@@ -8,7 +8,7 @@ import io.jsonwebtoken.Jwts;
 import java.time.Duration;
 import org.junit.jupiter.api.Test;
 
-public class JwtServiceTest {
+class JwtServiceTest {
   private static User.Builder userBuilder() {
     return new User.Builder().username("default-user").password("password");
   }
