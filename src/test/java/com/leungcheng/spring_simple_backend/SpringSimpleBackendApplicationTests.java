@@ -115,27 +115,27 @@ class SpringSimpleBackendApplicationTests {
   }
 
   @Test
-  public void shouldRejectSignupWithInvalidData() throws Exception {
-    // username
+  public void shouldRejectSignupWithInvalidUsername() throws Exception {
+    assertSignupRejectUsername("1".repeat(4));
+    assertSignupRejectUsername("1".repeat(21));
+  }
+
+  private void assertSignupRejectUsername(String username) throws Exception {
     UserCredentials userCredentials = UserCredentials.sample();
-    userCredentials.username = "1".repeat(4);
+    userCredentials.username = username;
     signup(userCredentials).andExpect(status().isBadRequest());
+  }
 
-    userCredentials = UserCredentials.sample();
-    userCredentials.username = "1".repeat(21);
-    signup(userCredentials).andExpect(status().isBadRequest());
+  @Test
+  public void shouldRejectSignupWithInvalidPassword() throws Exception {
+    assertSignupRejectPassword("1".repeat(7));
+    assertSignupRejectPassword("1".repeat(51));
+    assertSignupRejectPassword("i have space");
+  }
 
-    // password
-    userCredentials = UserCredentials.sample();
-    userCredentials.password = "1".repeat(7);
-    signup(userCredentials).andExpect(status().isBadRequest());
-
-    userCredentials = UserCredentials.sample();
-    userCredentials.password = "1".repeat(51);
-    signup(userCredentials).andExpect(status().isBadRequest());
-
-    userCredentials = UserCredentials.sample();
-    userCredentials.password = "i have space";
+  private void assertSignupRejectPassword(String password) throws Exception {
+    UserCredentials userCredentials = UserCredentials.sample();
+    userCredentials.password = password;
     signup(userCredentials).andExpect(status().isBadRequest());
   }
 
