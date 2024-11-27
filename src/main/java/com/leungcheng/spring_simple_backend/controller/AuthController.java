@@ -5,6 +5,7 @@ import com.leungcheng.spring_simple_backend.domain.NoSpaces;
 import com.leungcheng.spring_simple_backend.domain.User;
 import com.leungcheng.spring_simple_backend.domain.UserRepository;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -51,7 +52,7 @@ public class AuthController {
   }
 
   public record UserCredentials(
-      @Size(min = 5, max = 20) String username,
+      @Size(min = 5, max = 20) @Pattern(regexp = "^[a-z0-9]+$") String username,
       @Size(min = 8, max = 50) @NoSpaces String password) {}
 
   public record LoginResponse(String accessToken) {}

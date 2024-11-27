@@ -118,6 +118,8 @@ class SpringSimpleBackendApplicationTests {
   public void shouldRejectSignupWithInvalidUsername() throws Exception {
     assertSignupRejectUsername("1".repeat(4));
     assertSignupRejectUsername("1".repeat(21));
+    assertSignupRejectUsername("NonLowerCase");
+    assertSignupRejectUsername("non-alphanumeric&3");
   }
 
   private void assertSignupRejectUsername(String username) throws Exception {
@@ -158,7 +160,7 @@ class SpringSimpleBackendApplicationTests {
 
   @Test
   public void shouldRejectLoginWithNonexistentUsername() throws Exception {
-    login(new UserCredentials("nonexistent-user", "password")).andExpect(status().isForbidden());
+    login(new UserCredentials("nonexistentuser", "password")).andExpect(status().isForbidden());
   }
 
   @Test
@@ -248,7 +250,7 @@ class SpringSimpleBackendApplicationTests {
     String password;
 
     private static UserCredentials sample() {
-      return new UserCredentials("sample-user", "sample-password");
+      return new UserCredentials("user001", "sample-password");
     }
 
     private UserCredentials(String username, String password) {
