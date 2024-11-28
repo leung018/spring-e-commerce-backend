@@ -22,7 +22,10 @@ public @interface NoSpaces {
   class NoSpacesValidator implements ConstraintValidator<NoSpaces, String> {
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
-      return value != null && !value.contains(" ");
+      if (value == null) {
+        return true;
+      }
+      return !value.contains(" ");
     }
   }
 }
