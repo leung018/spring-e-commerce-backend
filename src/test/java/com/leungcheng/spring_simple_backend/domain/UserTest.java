@@ -7,15 +7,16 @@ import org.junit.jupiter.api.Test;
 
 class UserTest {
   private static User.Builder userBuilder() {
-    return new User.Builder().username("default_user").password("default_password");
+    return new User.Builder().username("default_user").password("default_password").balance(1.0);
   }
 
   @Test
   void shouldCreateUser() {
-    User user = userBuilder().username("user_1").password("password").build();
+    User user = userBuilder().username("user_1").password("password").balance(25).build();
 
     assertEquals("user_1", user.getUsername());
     assertEquals("password", user.getPassword());
+    assertEquals(25, user.getBalance());
   }
 
   @Test

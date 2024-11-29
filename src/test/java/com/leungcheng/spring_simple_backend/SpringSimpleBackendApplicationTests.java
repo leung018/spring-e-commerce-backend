@@ -220,6 +220,21 @@ class SpringSimpleBackendApplicationTests {
         .andExpect(jsonPath("$.userId").value(userId));
   }
 
+  @Test
+  void shouldGetAccountInfo() throws Exception {
+    UserCredentials userCredentials = UserCredentials.sample();
+    signup(userCredentials);
+
+    MvcResult result = login(userCredentials).andReturn();
+    String token = JsonPath.read(result.getResponse().getContentAsString(), "$.accessToken");
+    setAccessToken(token);
+
+    getAccountInfo()
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.balance").value(User.INITIAL_BALANCE))
+        .andExpect(jsonPath("$.username").value(userCredentials.username));
+  }
+
   private static class CreateProductParams {
     String name;
     double price;
@@ -285,5 +300,11 @@ class SpringSimpleBackendApplicationTests {
   private ResultActions login(UserCredentials userCredentials) throws Exception {
     return mockMvc.perform(
         post("/login").contentType("application/json").content(userCredentials.toContent()));
+  }
+
+  private ResultActions getAccountInfo() throws Exception {
+    MockHttpServletRequestBuilder builder = get("/me");
+    this.accessToken.ifPresent(s -> builder.header("Authorization", "Bearer " + s));
+    return mockMvc.perform(builder);
   }
 }

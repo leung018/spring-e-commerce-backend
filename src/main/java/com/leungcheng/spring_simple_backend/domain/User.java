@@ -6,6 +6,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import java.util.Collection;
 import java.util.List;
@@ -15,9 +16,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Entity
 @Table(name = "users")
 public class User implements UserDetails {
+  public static final double INITIAL_BALANCE = 100;
+
   public static class Builder {
     private String username;
     private String password;
+    private double balance;
 
     public Builder username(String username) {
       this.username = username;
@@ -29,10 +33,16 @@ public class User implements UserDetails {
       return this;
     }
 
+    public Builder balance(double balance) {
+      this.balance = balance;
+      return this;
+    }
+
     public User build() {
       User user = new User();
       user.username = username;
       user.password = password;
+      user.balance = balance;
       ObjectValidator.validate(user);
 
       return user;
@@ -51,6 +61,9 @@ public class User implements UserDetails {
 
   @NotBlank private String password;
 
+  @Min(0)
+  private double balance;
+
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
     return List.of(); // TODO: May be not return empty list
@@ -68,5 +81,9 @@ public class User implements UserDetails {
   @Override
   public String getUsername() {
     return username;
+  }
+
+  public double getBalance() {
+    return balance;
   }
 }
