@@ -5,6 +5,7 @@ import com.leungcheng.spring_simple_backend.domain.User;
 import com.leungcheng.spring_simple_backend.domain.UserRepository;
 import com.leungcheng.spring_simple_backend.validation.NoSpaces;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,8 +53,13 @@ public class AuthController {
   }
 
   public record UserCredentials(
-      @Size(min = 5, max = 20) @Pattern(regexp = "^[a-z0-9]+$") String username,
-      @Size(min = 8, max = 50) @NoSpaces String password) {}
+      @NotBlank
+          @Size(min = 5, max = 20)
+          @Pattern(
+              regexp = "^[a-z0-9]+$",
+              message = "must contain lower case alphabets and numbers only")
+          String username,
+      @NotBlank @Size(min = 8, max = 50) @NoSpaces String password) {}
 
   public record LoginResponse(String accessToken) {}
 }

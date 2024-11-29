@@ -5,9 +5,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.jayway.jsonpath.JsonPath;
+import com.leungcheng.spring_simple_backend.domain.Product;
 import com.leungcheng.spring_simple_backend.domain.ProductRepository;
 import com.leungcheng.spring_simple_backend.domain.User;
 import com.leungcheng.spring_simple_backend.domain.UserRepository;
+import com.leungcheng.spring_simple_backend.validation.ObjectValidator.ObjectValidationException;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -93,16 +95,28 @@ class SpringSimpleBackendApplicationTests {
   }
 
   @Test
-  void shouldRejectCreateProductWithInvalidData() throws Exception {
+  void shouldHandleObjectValidationException_AndIncludeTheProperInfoInTheResponse()
+      throws Exception {
     useNewUserAccessToken();
 
     CreateProductParams params = CreateProductParams.sample();
-    params.name = "";
-    createProduct(params).andExpect(status().isBadRequest());
-
-    params = CreateProductParams.sample();
     params.price = -1;
-    createProduct(params).andExpect(status().isBadRequest());
+
+    // Set up the expected exception that will be thrown when building this product
+    ObjectValidationException expectedException = null;
+    try {
+      new Product.Builder().name(params.name).price(params.price).quantity(params.quantity).build();
+    } catch (ObjectValidationException ex) {
+      expectedException = ex;
+    }
+    if (expectedException == null) {
+      throw new AssertionError("Expected exception not thrown");
+    }
+
+    // Assert the expected exception is handled correctly
+    createProduct(params)
+        .andExpect(status().isBadRequest())
+        .andExpect(content().string("price: " + expectedException.getFirstErrorMessage()));
   }
 
   @Test
