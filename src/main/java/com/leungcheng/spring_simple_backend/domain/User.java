@@ -16,6 +16,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 @Entity
 @Table(name = "users")
 public class User implements UserDetails {
+  public static final double INITIAL_BALANCE = 100;
+
   public static class Builder {
     private String username;
     private String password;

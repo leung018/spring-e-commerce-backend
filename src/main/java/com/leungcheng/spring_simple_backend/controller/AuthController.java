@@ -32,7 +32,11 @@ public class AuthController {
   public void signup(@Valid @RequestBody AuthController.UserCredentials userCredentials) {
     String hashedPassword = passwordEncoder.encode(userCredentials.password());
     User user =
-        new User.Builder().username(userCredentials.username()).password(hashedPassword).build();
+        new User.Builder()
+            .username(userCredentials.username())
+            .password(hashedPassword)
+            .balance(User.INITIAL_BALANCE)
+            .build();
     try {
       this.userRepository.save(user);
     } catch (DataIntegrityViolationException e) {
