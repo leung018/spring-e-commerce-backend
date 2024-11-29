@@ -25,8 +25,8 @@ class ExceptionHandlerAdvice {
 
   @ExceptionHandler(ObjectValidationException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
-  String illegalArgumentHandler(IllegalArgumentException ex) {
-    return ex.getMessage();
+  String objectValidationHandler(ObjectValidationException ex) {
+    return ex.getFirstErrorField() + ": " + ex.getFirstErrorMessage();
   }
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
