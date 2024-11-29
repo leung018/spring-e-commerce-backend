@@ -33,7 +33,8 @@ class ExceptionHandlerAdvice {
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   String methodArgumentNotValidHandler(MethodArgumentNotValidException ex) {
     // FIXME: This part is without any test coverage because I cannot trigger this handler in unit
-    // tests. But I can manually test it when running the app.
+    // tests. MockMvc behaves different from the real app. I have manually test this handler when
+    // running the app.
 
     BindingResult bindingResult = ex.getBindingResult();
     FieldError firstError = bindingResult.getFieldError();
