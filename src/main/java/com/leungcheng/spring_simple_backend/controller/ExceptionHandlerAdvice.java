@@ -26,7 +26,7 @@ class ExceptionHandlerAdvice {
   @ExceptionHandler(ObjectValidationException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   String objectValidationHandler(ObjectValidationException ex) {
-    return ex.getFirstErrorField() + ": " + ex.getFirstErrorMessage();
+    return formatValidationMessage(ex.getFirstErrorField(), ex.getFirstErrorMessage());
   }
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -40,6 +40,10 @@ class ExceptionHandlerAdvice {
     if (firstError == null) {
       return "Invalid request";
     }
-    return firstError.getField() + ": " + firstError.getDefaultMessage();
+    return formatValidationMessage(firstError.getField(), firstError.getDefaultMessage());
+  }
+
+  private static String formatValidationMessage(String errorField, String errorMessage) {
+    return errorField + ": " + errorMessage;
   }
 }
