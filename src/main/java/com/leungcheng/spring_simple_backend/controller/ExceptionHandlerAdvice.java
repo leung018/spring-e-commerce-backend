@@ -2,6 +2,9 @@ package com.leungcheng.spring_simple_backend.controller;
 
 import com.leungcheng.spring_simple_backend.validation.ObjectValidator.ObjectValidationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -24,5 +27,19 @@ class ExceptionHandlerAdvice {
   @ResponseStatus(HttpStatus.BAD_REQUEST)
   String illegalArgumentHandler(IllegalArgumentException ex) {
     return ex.getMessage();
+  }
+
+  @ExceptionHandler(MethodArgumentNotValidException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  String methodArgumentNotValidHandler(MethodArgumentNotValidException ex) {
+    // FIXME: This part is without any test coverage because I cannot trigger this handler in unit
+    // tests. But I can manually test it when running the app.
+
+    BindingResult bindingResult = ex.getBindingResult();
+    FieldError firstError = bindingResult.getFieldError();
+    if (firstError == null) {
+      return "Invalid request";
+    }
+    return firstError.getField() + ": " + firstError.getDefaultMessage();
   }
 }
