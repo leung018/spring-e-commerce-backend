@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import java.util.Map;
 
 public class PurchaseItems {
-  private Map<String, Integer> productIdsToQuantities = new java.util.HashMap<>();
+  private final Map<String, Integer> productIdsToQuantities = new java.util.HashMap<>();
 
   public void setPurchaseItem(String productId, int quantity) {
     if (quantity < 1) {
