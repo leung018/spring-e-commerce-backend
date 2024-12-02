@@ -7,8 +7,7 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "orders")
 public class Order {
-  @Id
-  private final String id = java.util.UUID.randomUUID().toString();
+  @Id private final String id = java.util.UUID.randomUUID().toString();
   private String userId;
   private PurchaseItems purchaseItems;
 
