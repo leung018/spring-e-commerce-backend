@@ -7,12 +7,22 @@ import org.junit.jupiter.api.Test;
 
 class PurchaseItemsTest {
   @Test
-  void shouldAddPurchaseItemAndGetThem() {
+  void shouldSetPurchaseItemAndGetThem() {
     PurchaseItems purchaseItems = new PurchaseItems();
-    purchaseItems.addPurchaseItem("product_id_1", 1);
-    purchaseItems.addPurchaseItem("product_id_2", 2);
+    purchaseItems.setPurchaseItem("product_id_1", 1);
+    purchaseItems.setPurchaseItem("product_id_2", 2);
 
     ImmutableMap<String, Integer> map = purchaseItems.getAll();
     assertEquals(ImmutableMap.of("product_id_1", 1, "product_id_2", 2), map);
+  }
+
+  @Test
+  void shouldDuplicateCallToSetExistingProductId_WillOverwriteTheQuantity() {
+    PurchaseItems purchaseItems = new PurchaseItems();
+    purchaseItems.setPurchaseItem("product_id_1", 1);
+    purchaseItems.setPurchaseItem("product_id_1", 2);
+
+    ImmutableMap<String, Integer> map = purchaseItems.getAll();
+    assertEquals(ImmutableMap.of("product_id_1", 2), map);
   }
 }

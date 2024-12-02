@@ -6,7 +6,7 @@ import java.util.Map;
 public class PurchaseItems {
   private Map<String, Integer> productIdsToQuantities = new java.util.HashMap<>();
 
-  public void addPurchaseItem(String productId, int quantity) {
+  public void setPurchaseItem(String productId, int quantity) {
     productIdsToQuantities.put(productId, quantity);
   }
 
