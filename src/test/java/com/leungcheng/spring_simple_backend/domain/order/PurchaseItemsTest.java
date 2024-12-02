@@ -1,6 +1,7 @@
 package com.leungcheng.spring_simple_backend.domain.order;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.google.common.collect.ImmutableMap;
 import org.junit.jupiter.api.Test;
@@ -24,5 +25,18 @@ class PurchaseItemsTest {
 
     ImmutableMap<String, Integer> map = purchaseItems.getAll();
     assertEquals(ImmutableMap.of("product_id_1", 2), map);
+  }
+
+  @Test
+  void shouldNotAllowLessThanZeroQuantity() {
+    PurchaseItems purchaseItems = new PurchaseItems();
+
+    assertThrows(
+        IllegalArgumentException.class, () -> purchaseItems.setPurchaseItem("product_id", 0));
+    assertThrows(
+        IllegalArgumentException.class, () -> purchaseItems.setPurchaseItem("product_id", -1));
+
+    ImmutableMap<String, Integer> map = purchaseItems.getAll();
+    assertEquals(0, map.size());
   }
 }
