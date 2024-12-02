@@ -13,7 +13,7 @@ class PurchaseItemsTest {
     purchaseItems.setPurchaseItem("product_id_1", 1);
     purchaseItems.setPurchaseItem("product_id_2", 2);
 
-    ImmutableMap<String, Integer> map = purchaseItems.getAll();
+    ImmutableMap<String, Integer> map = purchaseItems.getProductIdToQuantity();
     assertEquals(ImmutableMap.of("product_id_1", 1, "product_id_2", 2), map);
   }
 
@@ -23,7 +23,7 @@ class PurchaseItemsTest {
     purchaseItems.setPurchaseItem("product_id_1", 1);
     purchaseItems.setPurchaseItem("product_id_1", 2);
 
-    ImmutableMap<String, Integer> map = purchaseItems.getAll();
+    ImmutableMap<String, Integer> map = purchaseItems.getProductIdToQuantity();
     assertEquals(ImmutableMap.of("product_id_1", 2), map);
   }
 
@@ -36,7 +36,7 @@ class PurchaseItemsTest {
     assertThrows(
         IllegalArgumentException.class, () -> purchaseItems.setPurchaseItem("product_id", -1));
 
-    ImmutableMap<String, Integer> map = purchaseItems.getAll();
+    ImmutableMap<String, Integer> map = purchaseItems.getProductIdToQuantity();
     assertEquals(0, map.size());
   }
 }
