@@ -1,6 +1,8 @@
 package com.leungcheng.spring_simple_backend.domain;
 
 import static com.leungcheng.spring_simple_backend.testutil.CustomAssertions.assertBigDecimalEquals;
+import static com.leungcheng.spring_simple_backend.testutil.DefaultBuilders.productBuilder;
+import static com.leungcheng.spring_simple_backend.testutil.DefaultBuilders.userBuilder;
 
 import java.math.BigDecimal;
 import org.junit.jupiter.api.Test;
@@ -11,21 +13,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 class PrecisionTest {
   private @Autowired ProductRepository productRepository;
   private @Autowired UserRepository userRepository;
-
-  private static Product.Builder productBuilder() {
-    return new Product.Builder()
-        .name("Default Product")
-        .price(new BigDecimal("0.1"))
-        .userId("user_01")
-        .quantity(1);
-  }
-
-  private static User.Builder userBuilder() {
-    return new User.Builder()
-        .username("default_user")
-        .password("default_password")
-        .balance(new BigDecimal("1.0"));
-  }
 
   @Test
   void shouldProductKeepPrecisionAfterSavingToRepository() {

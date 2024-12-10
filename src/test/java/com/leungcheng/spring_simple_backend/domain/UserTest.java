@@ -1,5 +1,6 @@
 package com.leungcheng.spring_simple_backend.domain;
 
+import static com.leungcheng.spring_simple_backend.testutil.DefaultBuilders.userBuilder;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.leungcheng.spring_simple_backend.validation.ObjectValidator;
@@ -7,13 +8,6 @@ import java.math.BigDecimal;
 import org.junit.jupiter.api.Test;
 
 class UserTest {
-  private static User.Builder userBuilder() {
-    return new User.Builder()
-        .username("default_user")
-        .password("default_password")
-        .balance(new BigDecimal("1.0"));
-  }
-
   @Test
   void shouldCreateUser() {
     User user =

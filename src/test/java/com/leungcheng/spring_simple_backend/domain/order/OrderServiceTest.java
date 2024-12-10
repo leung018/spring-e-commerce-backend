@@ -8,6 +8,7 @@ import com.leungcheng.spring_simple_backend.domain.ProductRepository;
 import com.leungcheng.spring_simple_backend.domain.User;
 import com.leungcheng.spring_simple_backend.domain.UserRepository;
 import com.leungcheng.spring_simple_backend.domain.order.OrderService.CreateOrderException;
+import com.leungcheng.spring_simple_backend.testutil.DefaultBuilders;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
@@ -31,14 +32,11 @@ class OrderServiceTest {
         .quantity(10);
   }
 
-  private User.Builder userBuilder() {
-    return new User.Builder()
-        .username("user_" + UUID.randomUUID())
-        .password("password")
-        .balance(new BigDecimal(100));
+  private User.Builder randomUsernameUserBuilder() {
+    return DefaultBuilders.userBuilder().username(UUID.randomUUID().toString());
   }
 
-  private final User seedSeller = userBuilder().build();
+  private final User seedSeller = randomUsernameUserBuilder().build();
 
   @BeforeEach
   void setUp() {
@@ -66,7 +64,7 @@ class OrderServiceTest {
 
   @Test
   void shouldRejectCreateOrderWithEmptyPurchaseItems() {
-    User buyer = userBuilder().build();
+    User buyer = randomUsernameUserBuilder().build();
     userRepository.save(buyer);
 
     PurchaseItems purchaseItems = new PurchaseItems();
@@ -80,7 +78,7 @@ class OrderServiceTest {
 
   @Test
   void shouldRejectCreateOrderWithNonExistingProduct() {
-    User buyer = userBuilder().build();
+    User buyer = randomUsernameUserBuilder().build();
     userRepository.save(buyer);
 
     PurchaseItems purchaseItems = new PurchaseItems();
@@ -95,7 +93,7 @@ class OrderServiceTest {
 
   @Test
   void shouldRejectCreateOrderWithInsufficientBalance() {
-    User buyer = userBuilder().balance(new BigDecimal("9.99999")).build();
+    User buyer = randomUsernameUserBuilder().balance(new BigDecimal("9.99999")).build();
     userRepository.save(buyer);
 
     Product product = productBuilder().price(new BigDecimal(5)).quantity(999).build();
@@ -116,7 +114,7 @@ class OrderServiceTest {
 
   @Test
   void shouldRejectOrderWithInsufficientProductQuantity() {
-    User buyer = userBuilder().balance(new BigDecimal(999)).build();
+    User buyer = randomUsernameUserBuilder().balance(new BigDecimal(999)).build();
     userRepository.save(buyer);
 
     Product product = productBuilder().quantity(1).price(BigDecimal.ONE).build();
@@ -138,7 +136,7 @@ class OrderServiceTest {
 
   @Test
   void shouldNotThrowExceptionIfStockAndBuyerBalanceIsJustEnough() {
-    User buyer = userBuilder().balance(new BigDecimal(10)).build();
+    User buyer = randomUsernameUserBuilder().balance(new BigDecimal(10)).build();
     userRepository.save(buyer);
 
     Product product = productBuilder().quantity(1).price(new BigDecimal(10)).build();
@@ -152,7 +150,7 @@ class OrderServiceTest {
 
   @Test
   void shouldReduceProductQuantityAndBuyerBalanceWhenOrderIsSuccessful() {
-    User buyer = userBuilder().balance(new BigDecimal(25)).build();
+    User buyer = randomUsernameUserBuilder().balance(new BigDecimal(25)).build();
     userRepository.save(buyer);
 
     Product product1 = productBuilder().quantity(10).price(new BigDecimal("5.2")).build();
@@ -179,9 +177,9 @@ class OrderServiceTest {
 
   @Test
   void shouldIncreaseSellersBalance() {
-    User buyer = userBuilder().balance(new BigDecimal(999)).build();
-    User seller1 = userBuilder().balance(new BigDecimal(5)).build();
-    User seller2 = userBuilder().balance(new BigDecimal(10)).build();
+    User buyer = randomUsernameUserBuilder().balance(new BigDecimal(999)).build();
+    User seller1 = randomUsernameUserBuilder().balance(new BigDecimal(5)).build();
+    User seller2 = randomUsernameUserBuilder().balance(new BigDecimal(10)).build();
     userRepository.saveAll(List.of(buyer, seller1, seller2));
 
     Product product1 =
@@ -204,7 +202,7 @@ class OrderServiceTest {
 
   @Test
   void shouldCreateOrder() {
-    User buyer = userBuilder().balance(new BigDecimal(999)).build();
+    User buyer = randomUsernameUserBuilder().balance(new BigDecimal(999)).build();
     userRepository.save(buyer);
 
     Product product1 = productBuilder().quantity(999).price(new BigDecimal(5)).build();
@@ -227,7 +225,7 @@ class OrderServiceTest {
 
   @Test
   void shouldEachCreatedOrderHasDifferentId() {
-    User buyer = userBuilder().balance(new BigDecimal(999)).build();
+    User buyer = randomUsernameUserBuilder().balance(new BigDecimal(999)).build();
     userRepository.save(buyer);
 
     Product product = productBuilder().quantity(999).price(new BigDecimal(5)).build();
