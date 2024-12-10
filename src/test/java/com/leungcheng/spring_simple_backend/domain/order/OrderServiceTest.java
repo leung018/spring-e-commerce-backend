@@ -1,5 +1,6 @@
 package com.leungcheng.spring_simple_backend.domain.order;
 
+import static com.leungcheng.spring_simple_backend.testutil.CustomAssertions.assertBigDecimalEquals;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.leungcheng.spring_simple_backend.domain.Product;
@@ -247,9 +248,5 @@ class OrderServiceTest {
     assertEquals(
         expected.getPurchaseItems().getProductIdToQuantity(),
         actual.getPurchaseItems().getProductIdToQuantity());
-  }
-
-  private void assertBigDecimalEquals(BigDecimal expected, BigDecimal actual) {
-    assertEquals(0, expected.compareTo(actual));
   }
 }

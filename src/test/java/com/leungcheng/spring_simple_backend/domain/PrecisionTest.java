@@ -1,6 +1,6 @@
 package com.leungcheng.spring_simple_backend.domain;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static com.leungcheng.spring_simple_backend.testutil.CustomAssertions.assertBigDecimalEquals;
 
 import java.math.BigDecimal;
 import org.junit.jupiter.api.Test;
@@ -43,9 +43,5 @@ class PrecisionTest {
     User savedUser = userRepository.findById(user.getId()).orElseThrow();
 
     assertBigDecimalEquals(user.getBalance(), savedUser.getBalance());
-  }
-
-  private void assertBigDecimalEquals(BigDecimal expected, BigDecimal actual) {
-    assertEquals(0, expected.compareTo(actual));
   }
 }
