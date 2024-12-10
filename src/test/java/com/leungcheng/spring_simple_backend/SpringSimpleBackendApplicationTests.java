@@ -1,5 +1,6 @@
 package com.leungcheng.spring_simple_backend;
 
+import static com.leungcheng.spring_simple_backend.testutil.CustomAssertions.assertBigDecimalEquals;
 import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -235,14 +236,16 @@ class SpringSimpleBackendApplicationTests {
     String token = JsonPath.read(result.getResponse().getContentAsString(), "$.accessToken");
     setAccessToken(token);
 
-    getAccountInfo()
-        .andExpect(status().isOk())
-        .andExpect(
-            jsonPath("$.balance")
-                .value(
-                    "100.0")) // FIXME: not hardcoding it. Perhaps move INITIAL_BALANCE to sth that
-        // can be accessed by tests
-        .andExpect(jsonPath("$.username").value(userCredentials.username));
+    result =
+        getAccountInfo()
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.username").value(userCredentials.username))
+            .andReturn();
+
+    BigDecimal actualBalance =
+        BigDecimal.valueOf(
+            (Double) JsonPath.read(result.getResponse().getContentAsString(), "$.balance"));
+    assertBigDecimalEquals(User.INITIAL_BALANCE, actualBalance);
   }
 
   private static class CreateProductParams {
