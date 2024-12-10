@@ -48,8 +48,10 @@ class ProductTest {
   @Test
   void shouldRaiseExceptionWhenBuild_IfParamsViolateTheValidationConstraints() {
     assertThrowValidationException(productBuilder().quantity(-1));
+    productBuilder().quantity(0).build();
 
     assertThrowValidationException(productBuilder().price(new BigDecimal("-1")));
+    productBuilder().price(BigDecimal.ZERO).build();
 
     assertThrowValidationException(productBuilder().name(""));
     assertThrowValidationException(productBuilder().name(null));
