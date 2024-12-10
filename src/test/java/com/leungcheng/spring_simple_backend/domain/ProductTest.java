@@ -1,5 +1,6 @@
 package com.leungcheng.spring_simple_backend.domain;
 
+import static com.leungcheng.spring_simple_backend.testutil.DefaultBuilders.productBuilder;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.leungcheng.spring_simple_backend.validation.ObjectValidator;
@@ -7,14 +8,6 @@ import java.math.BigDecimal;
 import org.junit.jupiter.api.Test;
 
 class ProductTest {
-
-  private static Product.Builder productBuilder() {
-    return new Product.Builder()
-        .name("Default Product")
-        .price(new BigDecimal("0.1"))
-        .userId("user_01")
-        .quantity(1);
-  }
 
   @Test
   void shouldCreateProduct() {
