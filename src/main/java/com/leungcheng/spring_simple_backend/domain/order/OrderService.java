@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +26,7 @@ public class OrderService {
     }
   }
 
+  @Retryable(noRetryFor = CreateOrderException.class)
   @Transactional(isolation = Isolation.SERIALIZABLE)
   public Order createOrder(String buyerUserId, PurchaseItems purchaseItems) {
     User buyer =

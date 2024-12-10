@@ -240,6 +240,36 @@ class OrderServiceTest {
     assertNotEquals(order1.getId(), order2.getId());
   }
 
+  @Test
+  void shouldAutoRetry_WhenOneThreadMayFailJustDueToRacing() {
+    User seller = randomUsernameUserBuilder().balance(new BigDecimal(999)).build();
+    User buyer = randomUsernameUserBuilder().balance(new BigDecimal(999)).build();
+    userRepository.saveAll(List.of(seller, buyer));
+
+    Product product =
+        productBuilder().quantity(2).price(new BigDecimal(5)).userId(seller.getId()).build();
+    productRepository.save(product);
+
+    PurchaseItems purchaseItems = new PurchaseItems();
+    purchaseItems.setPurchaseItem(product.getId(), 1);
+
+    // 2 threads try to buy the same product at the same time
+    Thread thread1 = new Thread(() -> orderService.createOrder(buyer.getId(), purchaseItems));
+    Thread thread2 = new Thread(() -> orderService.createOrder(buyer.getId(), purchaseItems));
+
+    thread1.start();
+    thread2.start();
+
+    try {
+      thread1.join();
+      thread2.join();
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e);
+    }
+
+    assertEquals(0, productRepository.findById(product.getId()).orElseThrow().getQuantity());
+  }
+
   private void assertOrderEquals(Order expected, Order actual) {
     assertEquals(expected.getId(), actual.getId());
     assertEquals(expected.getBuyerUserId(), actual.getBuyerUserId());
