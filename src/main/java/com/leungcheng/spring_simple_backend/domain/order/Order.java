@@ -13,7 +13,7 @@ public class Order {
 
   private Order() {}
 
-  Order (String buyerUserId, PurchaseItems purchaseItems) {
+  Order(String buyerUserId, PurchaseItems purchaseItems) {
     this.buyerUserId = buyerUserId;
     this.purchaseItems = purchaseItems;
   }
