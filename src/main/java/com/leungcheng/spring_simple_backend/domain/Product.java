@@ -2,6 +2,7 @@ package com.leungcheng.spring_simple_backend.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.leungcheng.spring_simple_backend.validation.ObjectValidator;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -71,6 +72,7 @@ public class Product {
 
   @NotBlank private String name;
 
+  @Column(precision = 19, scale = 5)
   @Min(0)
   private BigDecimal price;
 
