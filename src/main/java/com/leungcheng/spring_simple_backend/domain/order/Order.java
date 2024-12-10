@@ -8,17 +8,22 @@ import jakarta.persistence.Table;
 @Table(name = "orders")
 public class Order {
   @Id private final String id = java.util.UUID.randomUUID().toString();
-  private String userId;
+  private String buyerUserId;
   private PurchaseItems purchaseItems;
 
   private Order() {}
+
+  Order(String buyerUserId, PurchaseItems purchaseItems) {
+    this.buyerUserId = buyerUserId;
+    this.purchaseItems = purchaseItems;
+  }
 
   public String getId() {
     return id;
   }
 
-  public String getUserId() {
-    return userId;
+  public String getBuyerUserId() {
+    return buyerUserId;
   }
 
   public PurchaseItems getPurchaseItems() {
