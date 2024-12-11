@@ -225,10 +225,30 @@ class OrderServiceTest {
     PurchaseItems purchaseItems = new PurchaseItems();
     purchaseItems.setPurchaseItem(product.getId(), 1);
 
-    Order order1 = createOrder(buyer.getId(), purchaseItems);
-    Order order2 = createOrder(buyer.getId(), purchaseItems);
+    Order order1 = createOrder(buyer.getId(), purchaseItems, "request-01");
+    Order order2 = createOrder(buyer.getId(), purchaseItems, "request-02");
 
     assertNotEquals(order1.getId(), order2.getId());
+  }
+
+  @Test
+  void shouldOneOrderBeingCreatedOnly_IfCreateOrderWithSameRequestIdTwice() {
+    User buyer = randomUsernameUserBuilder().balance(new BigDecimal(10)).build();
+    userRepository.save(buyer);
+
+    Product product = productBuilder().quantity(5).price(new BigDecimal(1)).build();
+    productRepository.save(product);
+
+    PurchaseItems purchaseItems = new PurchaseItems();
+    purchaseItems.setPurchaseItem(product.getId(), 1);
+
+    Order order1 = createOrder(buyer.getId(), purchaseItems, "request_id");
+    Order order2 = createOrder(buyer.getId(), purchaseItems, "request_id");
+
+    assertOrderEquals(order2, order1);
+    assertEquals(4, productRepository.findById(product.getId()).orElseThrow().getQuantity());
+    assertBigDecimalEquals(
+        new BigDecimal(9), userRepository.findById(buyer.getId()).orElseThrow().getBalance());
   }
 
   @Test
@@ -245,8 +265,8 @@ class OrderServiceTest {
     purchaseItems.setPurchaseItem(product.getId(), 1);
 
     // 2 threads try to buy the same product at the same time
-    Thread thread1 = new Thread(() -> createOrder(buyer.getId(), purchaseItems));
-    Thread thread2 = new Thread(() -> createOrder(buyer.getId(), purchaseItems));
+    Thread thread1 = new Thread(() -> createOrder(buyer.getId(), purchaseItems, "request-01"));
+    Thread thread2 = new Thread(() -> createOrder(buyer.getId(), purchaseItems, "request-02"));
 
     thread1.start();
     thread2.start();
@@ -265,11 +285,16 @@ class OrderServiceTest {
     return orderService.createOrder(buyerUserId, purchaseItems, "dummy_request_id");
   }
 
+  private Order createOrder(String buyerUserId, PurchaseItems purchaseItems, String requestId) {
+    return orderService.createOrder(buyerUserId, purchaseItems, requestId);
+  }
+
   private void assertOrderEquals(Order expected, Order actual) {
     assertEquals(expected.getId(), actual.getId());
     assertEquals(expected.getBuyerUserId(), actual.getBuyerUserId());
     assertEquals(
         expected.getPurchaseItems().getProductIdToQuantity(),
         actual.getPurchaseItems().getProductIdToQuantity());
+    assertEquals(expected.getRequestId(), actual.getRequestId());
   }
 }
