@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import com.google.common.collect.ImmutableMap;
 import com.jayway.jsonpath.JsonPath;
 import com.leungcheng.spring_simple_backend.domain.Product;
 import com.leungcheng.spring_simple_backend.domain.ProductRepository;
@@ -12,6 +13,7 @@ import com.leungcheng.spring_simple_backend.domain.User;
 import com.leungcheng.spring_simple_backend.domain.UserRepository;
 import com.leungcheng.spring_simple_backend.validation.ObjectValidator.ObjectValidationException;
 import java.math.BigDecimal;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -253,6 +255,36 @@ class SpringSimpleBackendApplicationTests {
     assertBigDecimalEquals(User.INITIAL_BALANCE, actualBalance);
   }
 
+  @Test
+  void shouldCreateOrder() throws Exception {
+    String userId = useNewUserAccessToken();
+
+    CreateProductParams productParams = CreateProductParams.sample();
+
+    // Product 1
+    productParams.price = "1";
+    productParams.quantity = 99;
+    MvcResult result = createProduct(productParams).andReturn();
+    String product1Id = JsonPath.read(result.getResponse().getContentAsString(), "$.id");
+
+    // Product 2
+    result = createProduct(productParams).andReturn();
+    String product2Id = JsonPath.read(result.getResponse().getContentAsString(), "$.id");
+
+    // Create Order
+    CreateOrderParams createOrderParams =
+        new CreateOrderParams("request-001", ImmutableMap.of(product1Id, 4, product2Id, 5));
+
+    createOrder(createOrderParams)
+        .andExpect(status().isCreated())
+        .andExpect(jsonPath("$.id").exists())
+        .andExpect(jsonPath("$.purchaseItems").exists())
+        .andExpect(jsonPath("$.purchaseItems.productIdToQuantity." + product1Id).value(4))
+        .andExpect(jsonPath("$.purchaseItems.productIdToQuantity." + product2Id).value(5))
+        .andExpect(jsonPath("$.requestId").value("request-001"))
+        .andExpect(jsonPath("$.buyerUserId").value(userId));
+  }
+
   private static class CreateProductParams {
     String name;
     String price;
@@ -324,6 +356,37 @@ class SpringSimpleBackendApplicationTests {
     MockHttpServletRequestBuilder builder = get("/me");
     addAuthHeader(builder);
     return mockMvc.perform(builder);
+  }
+
+  private ResultActions createOrder(CreateOrderParams createOrderParams) throws Exception {
+    MockHttpServletRequestBuilder builder =
+        post("/orders").contentType("application/json").content(createOrderParams.toContent());
+    addAuthHeader(builder);
+    return mockMvc.perform(builder);
+  }
+
+  private static class CreateOrderParams {
+    String requestId;
+    ImmutableMap<String, Integer> productIdToQuantity;
+
+    CreateOrderParams(String requestId, ImmutableMap<String, Integer> productIdToQuantity) {
+      this.requestId = requestId;
+      this.productIdToQuantity = productIdToQuantity;
+    }
+
+    String toContent() {
+      return "{\"requestId\": \""
+          + this.requestId
+          + "\", \"productIdToQuantity\": "
+          + productIdToQuantityContent()
+          + "}";
+    }
+
+    private String productIdToQuantityContent() {
+      return productIdToQuantity.entrySet().stream()
+          .map(entry -> "\"" + entry.getKey() + "\": " + entry.getValue())
+          .collect(Collectors.joining(", ", "{", "}"));
+    }
   }
 
   private void addAuthHeader(MockHttpServletRequestBuilder builder) {
