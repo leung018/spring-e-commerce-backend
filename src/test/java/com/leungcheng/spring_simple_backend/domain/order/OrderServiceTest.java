@@ -252,6 +252,24 @@ class OrderServiceTest {
   }
 
   @Test
+  void shouldDifferentBuyerUsingSameRequestId_WillCreateTwoOrders() {
+    User buyer1 = randomUsernameUserBuilder().balance(new BigDecimal(10)).build();
+    User buyer2 = randomUsernameUserBuilder().balance(new BigDecimal(10)).build();
+    userRepository.saveAll(List.of(buyer1, buyer2));
+
+    Product product = productBuilder().quantity(5).price(new BigDecimal(1)).build();
+    productRepository.save(product);
+
+    PurchaseItems purchaseItems = new PurchaseItems();
+    purchaseItems.setPurchaseItem(product.getId(), 1);
+
+    Order order1 = createOrder(buyer1.getId(), purchaseItems, "request_id");
+    Order order2 = createOrder(buyer2.getId(), purchaseItems, "request_id");
+
+    assertNotEquals(order1.getId(), order2.getId());
+  }
+
+  @Test
   void shouldAutoRetry_WhenOneThreadMayFailJustDueToRacing() {
     User seller = randomUsernameUserBuilder().balance(new BigDecimal(999)).build();
     User buyer = randomUsernameUserBuilder().balance(new BigDecimal(999)).build();
