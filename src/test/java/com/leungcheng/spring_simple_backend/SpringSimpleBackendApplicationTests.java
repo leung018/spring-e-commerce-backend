@@ -280,17 +280,13 @@ class SpringSimpleBackendApplicationTests {
   private ResultActions createProduct(CreateProductParams params) throws Exception {
     MockHttpServletRequestBuilder builder =
         post("/products").contentType("application/json").content(params.toContent());
-    if (isAccessTokenSet()) {
-      builder.header("Authorization", "Bearer " + this.accessToken);
-    }
+    addAuthHeader(builder);
     return mockMvc.perform(builder);
   }
 
   private ResultActions getProduct(String id) throws Exception {
     MockHttpServletRequestBuilder builder = get("/products/" + id);
-    if (isAccessTokenSet()) {
-      builder.header("Authorization", "Bearer " + this.accessToken);
-    }
+    addAuthHeader(builder);
     return mockMvc.perform(builder);
   }
 
@@ -324,9 +320,13 @@ class SpringSimpleBackendApplicationTests {
 
   private ResultActions getAccountInfo() throws Exception {
     MockHttpServletRequestBuilder builder = get("/me");
+    addAuthHeader(builder);
+    return mockMvc.perform(builder);
+  }
+
+  private void addAuthHeader(MockHttpServletRequestBuilder builder) {
     if (isAccessTokenSet()) {
       builder.header("Authorization", "Bearer " + this.accessToken);
     }
-    return mockMvc.perform(builder);
   }
 }
