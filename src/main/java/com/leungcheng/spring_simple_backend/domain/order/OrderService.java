@@ -28,7 +28,7 @@ public class OrderService {
 
   @Retryable(noRetryFor = CreateOrderException.class)
   @Transactional(isolation = Isolation.SERIALIZABLE)
-  public Order createOrder(String buyerUserId, PurchaseItems purchaseItems) {
+  public Order createOrder(String buyerUserId, PurchaseItems purchaseItems, String requestId) {
     User buyer =
         getUser(buyerUserId).orElseThrow(() -> new CreateOrderException("Buyer does not exist"));
 
