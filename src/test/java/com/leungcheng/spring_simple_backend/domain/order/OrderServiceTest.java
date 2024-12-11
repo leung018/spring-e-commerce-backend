@@ -57,8 +57,7 @@ class OrderServiceTest {
 
     CreateOrderException exception =
         assertThrows(
-            CreateOrderException.class,
-            () -> orderService.createOrder("non_existing_buyer_id", purchaseItems));
+            CreateOrderException.class, () -> createOrder("non_existing_buyer_id", purchaseItems));
     assertEquals("Buyer does not exist", exception.getMessage());
   }
 
@@ -70,9 +69,7 @@ class OrderServiceTest {
     PurchaseItems purchaseItems = new PurchaseItems();
 
     CreateOrderException exception =
-        assertThrows(
-            CreateOrderException.class,
-            () -> orderService.createOrder(buyer.getId(), purchaseItems));
+        assertThrows(CreateOrderException.class, () -> createOrder(buyer.getId(), purchaseItems));
     assertEquals("Purchase items cannot be empty", exception.getMessage());
   }
 
@@ -85,9 +82,7 @@ class OrderServiceTest {
     purchaseItems.setPurchaseItem("non_existing_product_id", 1);
 
     CreateOrderException exception =
-        assertThrows(
-            CreateOrderException.class,
-            () -> orderService.createOrder(buyer.getId(), purchaseItems));
+        assertThrows(CreateOrderException.class, () -> createOrder(buyer.getId(), purchaseItems));
     assertEquals("Product: non_existing_product_id does not exist", exception.getMessage());
   }
 
@@ -103,9 +98,7 @@ class OrderServiceTest {
     purchaseItems.setPurchaseItem(product.getId(), 2);
 
     CreateOrderException exception =
-        assertThrows(
-            CreateOrderException.class,
-            () -> orderService.createOrder(buyer.getId(), purchaseItems));
+        assertThrows(CreateOrderException.class, () -> createOrder(buyer.getId(), purchaseItems));
     assertEquals("Insufficient balance", exception.getMessage());
 
     // product quantity should not be reduced
@@ -124,9 +117,7 @@ class OrderServiceTest {
     purchaseItems.setPurchaseItem(product.getId(), 2);
 
     CreateOrderException exception =
-        assertThrows(
-            CreateOrderException.class,
-            () -> orderService.createOrder(buyer.getId(), purchaseItems));
+        assertThrows(CreateOrderException.class, () -> createOrder(buyer.getId(), purchaseItems));
     assertEquals("Insufficient stock for product: " + product.getId(), exception.getMessage());
 
     // buyer balance should not be reduced
@@ -145,7 +136,7 @@ class OrderServiceTest {
     PurchaseItems purchaseItems = new PurchaseItems();
     purchaseItems.setPurchaseItem(product.getId(), 1);
 
-    orderService.createOrder(buyer.getId(), purchaseItems); // should not throw exception
+    createOrder(buyer.getId(), purchaseItems); // should not throw exception
   }
 
   @Test
@@ -162,7 +153,7 @@ class OrderServiceTest {
     purchaseItems.setPurchaseItem(product1.getId(), 2);
     purchaseItems.setPurchaseItem(product2.getId(), 3);
 
-    orderService.createOrder(buyer.getId(), purchaseItems);
+    createOrder(buyer.getId(), purchaseItems);
 
     assertEquals(8, productRepository.findById(product1.getId()).orElseThrow().getQuantity());
     assertEquals(7, productRepository.findById(product2.getId()).orElseThrow().getQuantity());
@@ -192,7 +183,7 @@ class OrderServiceTest {
     purchaseItems.setPurchaseItem(product1.getId(), 2);
     purchaseItems.setPurchaseItem(product2.getId(), 3);
 
-    orderService.createOrder(buyer.getId(), purchaseItems);
+    createOrder(buyer.getId(), purchaseItems);
 
     assertBigDecimalEquals(
         new BigDecimal(15), userRepository.findById(seller1.getId()).orElseThrow().getBalance());
@@ -213,7 +204,7 @@ class OrderServiceTest {
     purchaseItems.setPurchaseItem(product1.getId(), 2);
     purchaseItems.setPurchaseItem(product2.getId(), 5);
 
-    Order order = orderService.createOrder(buyer.getId(), purchaseItems);
+    Order order = createOrder(buyer.getId(), purchaseItems);
 
     assertEquals(buyer.getId(), order.getBuyerUserId());
     assertEquals(
@@ -234,10 +225,30 @@ class OrderServiceTest {
     PurchaseItems purchaseItems = new PurchaseItems();
     purchaseItems.setPurchaseItem(product.getId(), 1);
 
-    Order order1 = orderService.createOrder(buyer.getId(), purchaseItems);
-    Order order2 = orderService.createOrder(buyer.getId(), purchaseItems);
+    Order order1 = createOrder(buyer.getId(), purchaseItems, "request-01");
+    Order order2 = createOrder(buyer.getId(), purchaseItems, "request-02");
 
     assertNotEquals(order1.getId(), order2.getId());
+  }
+
+  @Test
+  void shouldOneOrderBeingCreatedOnly_IfCreateOrderWithSameRequestIdTwice() {
+    User buyer = randomUsernameUserBuilder().balance(new BigDecimal(10)).build();
+    userRepository.save(buyer);
+
+    Product product = productBuilder().quantity(5).price(new BigDecimal(1)).build();
+    productRepository.save(product);
+
+    PurchaseItems purchaseItems = new PurchaseItems();
+    purchaseItems.setPurchaseItem(product.getId(), 1);
+
+    Order order1 = createOrder(buyer.getId(), purchaseItems, "request_id");
+    Order order2 = createOrder(buyer.getId(), purchaseItems, "request_id");
+
+    assertOrderEquals(order2, order1);
+    assertEquals(4, productRepository.findById(product.getId()).orElseThrow().getQuantity());
+    assertBigDecimalEquals(
+        new BigDecimal(9), userRepository.findById(buyer.getId()).orElseThrow().getBalance());
   }
 
   @Test
@@ -254,8 +265,8 @@ class OrderServiceTest {
     purchaseItems.setPurchaseItem(product.getId(), 1);
 
     // 2 threads try to buy the same product at the same time
-    Thread thread1 = new Thread(() -> orderService.createOrder(buyer.getId(), purchaseItems));
-    Thread thread2 = new Thread(() -> orderService.createOrder(buyer.getId(), purchaseItems));
+    Thread thread1 = new Thread(() -> createOrder(buyer.getId(), purchaseItems, "request-01"));
+    Thread thread2 = new Thread(() -> createOrder(buyer.getId(), purchaseItems, "request-02"));
 
     thread1.start();
     thread2.start();
@@ -270,11 +281,20 @@ class OrderServiceTest {
     assertEquals(0, productRepository.findById(product.getId()).orElseThrow().getQuantity());
   }
 
+  private Order createOrder(String buyerUserId, PurchaseItems purchaseItems) {
+    return orderService.createOrder(buyerUserId, purchaseItems, "dummy_request_id");
+  }
+
+  private Order createOrder(String buyerUserId, PurchaseItems purchaseItems, String requestId) {
+    return orderService.createOrder(buyerUserId, purchaseItems, requestId);
+  }
+
   private void assertOrderEquals(Order expected, Order actual) {
     assertEquals(expected.getId(), actual.getId());
     assertEquals(expected.getBuyerUserId(), actual.getBuyerUserId());
     assertEquals(
         expected.getPurchaseItems().getProductIdToQuantity(),
         actual.getPurchaseItems().getProductIdToQuantity());
+    assertEquals(expected.getRequestId(), actual.getRequestId());
   }
 }

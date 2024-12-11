@@ -28,7 +28,12 @@ public class OrderService {
 
   @Retryable(noRetryFor = CreateOrderException.class)
   @Transactional(isolation = Isolation.SERIALIZABLE)
-  public Order createOrder(String buyerUserId, PurchaseItems purchaseItems) {
+  public Order createOrder(String buyerUserId, PurchaseItems purchaseItems, String requestId) {
+    Optional<Order> order = orderRepository.findByRequestId(requestId);
+    if (order.isPresent()) {
+      return order.get();
+    }
+
     User buyer =
         getUser(buyerUserId).orElseThrow(() -> new CreateOrderException("Buyer does not exist"));
 
@@ -39,7 +44,7 @@ public class OrderService {
     }
     saveNewBalance(buyer, buyer.getBalance().subtract(totalCost));
 
-    return addNewOrder(buyerUserId, purchaseItems);
+    return addNewOrder(buyerUserId, purchaseItems, requestId);
   }
 
   private Optional<User> getUser(String userId) {
@@ -51,8 +56,8 @@ public class OrderService {
     userRepository.save(updatedBuyer);
   }
 
-  private Order addNewOrder(String buyerUserId, PurchaseItems purchaseItems) {
-    Order order = new Order(buyerUserId, purchaseItems);
+  private Order addNewOrder(String buyerUserId, PurchaseItems purchaseItems, String requestId) {
+    Order order = new Order(buyerUserId, purchaseItems, requestId);
     return orderRepository.save(order);
   }
 

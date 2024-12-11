@@ -1,5 +1,6 @@
 package com.leungcheng.spring_simple_backend.domain.order;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -11,11 +12,15 @@ public class Order {
   private String buyerUserId;
   private PurchaseItems purchaseItems;
 
+  @Column(unique = true)
+  private String requestId;
+
   private Order() {}
 
-  Order(String buyerUserId, PurchaseItems purchaseItems) {
+  Order(String buyerUserId, PurchaseItems purchaseItems, String requestId) {
     this.buyerUserId = buyerUserId;
     this.purchaseItems = purchaseItems;
+    this.requestId = requestId;
   }
 
   public String getId() {
@@ -28,5 +33,9 @@ public class Order {
 
   public PurchaseItems getPurchaseItems() {
     return purchaseItems;
+  }
+
+  public String getRequestId() {
+    return requestId;
   }
 }
