@@ -29,7 +29,7 @@ public class OrderService {
   @Retryable(noRetryFor = CreateOrderException.class)
   @Transactional(isolation = Isolation.SERIALIZABLE)
   public Order createOrder(String buyerUserId, PurchaseItems purchaseItems, String requestId) {
-    Optional<Order> order = orderRepository.findByRequestId(requestId);
+    Optional<Order> order = orderRepository.findByBuyerUserIdAndRequestId(buyerUserId, requestId);
     if (order.isPresent()) {
       return order.get();
     }

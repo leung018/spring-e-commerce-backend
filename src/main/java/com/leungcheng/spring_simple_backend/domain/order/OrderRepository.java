@@ -4,5 +4,5 @@ import java.util.Optional;
 import org.springframework.data.repository.CrudRepository;
 
 public interface OrderRepository extends CrudRepository<Order, String> {
-  Optional<Order> findByRequestId(String requestId);
+  Optional<Order> findByBuyerUserIdAndRequestId(String buyerUserId, String requestId);
 }

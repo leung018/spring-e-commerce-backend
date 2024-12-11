@@ -1,18 +1,16 @@
 package com.leungcheng.spring_simple_backend.domain.order;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
-@Table(name = "orders")
+@Table(
+    name = "orders",
+    uniqueConstraints = {@UniqueConstraint(columnNames = {"requestId", "buyerUserId"})})
 public class Order {
   @Id private final String id = java.util.UUID.randomUUID().toString();
   private String buyerUserId;
   private PurchaseItems purchaseItems;
 
-  @Column(unique = true)
   private String requestId;
 
   private Order() {}
