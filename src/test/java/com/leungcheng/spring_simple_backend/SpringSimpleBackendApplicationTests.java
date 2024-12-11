@@ -89,13 +89,15 @@ class SpringSimpleBackendApplicationTests {
   void shouldIgnoreIdWhenCreateProduct() throws Exception {
     useNewUserAccessToken();
 
+    MockHttpServletRequestBuilder request =
+        post("/products")
+            .contentType("application/json")
+            .content(
+                "{\"id\": \"should-be-ignored\", \"name\": \"Product 1\", \"price\": 1.0, \"quantity\": 50}");
+    addAuthHeader(request);
+
     mockMvc
-        .perform(
-            post("/products")
-                .contentType("application/json")
-                .header("Authorization", "Bearer " + accessToken)
-                .content(
-                    "{\"id\": \"should-be-ignored\", \"name\": \"Product 1\", \"price\": 1.0, \"quantity\": 50}"))
+        .perform(request)
         .andExpect(status().isCreated())
         .andExpect(jsonPath("$.id", not("should-be-ignored")));
   }
