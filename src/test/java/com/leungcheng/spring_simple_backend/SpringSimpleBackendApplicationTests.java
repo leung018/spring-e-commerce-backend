@@ -12,7 +12,6 @@ import com.leungcheng.spring_simple_backend.domain.User;
 import com.leungcheng.spring_simple_backend.domain.UserRepository;
 import com.leungcheng.spring_simple_backend.validation.ObjectValidator.ObjectValidationException;
 import java.math.BigDecimal;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +30,7 @@ class SpringSimpleBackendApplicationTests {
   @Autowired private ProductRepository productRepository;
   @Autowired private UserRepository userRepository;
 
-  private Optional<String> accessToken = Optional.empty();
+  private String accessToken = "";
 
   @BeforeEach
   public void setup() {
@@ -40,11 +39,15 @@ class SpringSimpleBackendApplicationTests {
   }
 
   private void setAccessToken(String token) {
-    this.accessToken = Optional.of(token);
+    this.accessToken = token;
   }
 
   private void clearAccessToken() {
-    this.accessToken = Optional.empty();
+    this.accessToken = "";
+  }
+
+  private boolean isAccessTokenSet() {
+    return !this.accessToken.isEmpty();
   }
 
   private String useNewUserAccessToken() throws Exception {
@@ -90,7 +93,7 @@ class SpringSimpleBackendApplicationTests {
         .perform(
             post("/products")
                 .contentType("application/json")
-                .header("Authorization", "Bearer " + accessToken.orElseThrow())
+                .header("Authorization", "Bearer " + accessToken)
                 .content(
                     "{\"id\": \"should-be-ignored\", \"name\": \"Product 1\", \"price\": 1.0, \"quantity\": 50}"))
         .andExpect(status().isCreated())
@@ -204,7 +207,7 @@ class SpringSimpleBackendApplicationTests {
         .perform(
             post("/products")
                 .contentType("application/json")
-                .header("Authorization", "NotBearer " + accessToken.orElseThrow())
+                .header("Authorization", "NotBearer " + accessToken)
                 .content(CreateProductParams.sample().toContent()))
         .andExpect(status().isForbidden());
 
@@ -277,13 +280,17 @@ class SpringSimpleBackendApplicationTests {
   private ResultActions createProduct(CreateProductParams params) throws Exception {
     MockHttpServletRequestBuilder builder =
         post("/products").contentType("application/json").content(params.toContent());
-    this.accessToken.ifPresent(s -> builder.header("Authorization", "Bearer " + s));
+    if (isAccessTokenSet()) {
+      builder.header("Authorization", "Bearer " + this.accessToken);
+    }
     return mockMvc.perform(builder);
   }
 
   private ResultActions getProduct(String id) throws Exception {
     MockHttpServletRequestBuilder builder = get("/products/" + id);
-    this.accessToken.ifPresent(s -> builder.header("Authorization", "Bearer " + s));
+    if (isAccessTokenSet()) {
+      builder.header("Authorization", "Bearer " + this.accessToken);
+    }
     return mockMvc.perform(builder);
   }
 
@@ -317,7 +324,9 @@ class SpringSimpleBackendApplicationTests {
 
   private ResultActions getAccountInfo() throws Exception {
     MockHttpServletRequestBuilder builder = get("/me");
-    this.accessToken.ifPresent(s -> builder.header("Authorization", "Bearer " + s));
+    if (isAccessTokenSet()) {
+      builder.header("Authorization", "Bearer " + this.accessToken);
+    }
     return mockMvc.perform(builder);
   }
 }
