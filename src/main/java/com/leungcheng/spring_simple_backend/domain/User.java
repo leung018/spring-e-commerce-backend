@@ -1,6 +1,5 @@
 package com.leungcheng.spring_simple_backend.domain;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.leungcheng.spring_simple_backend.validation.ObjectValidator;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -64,9 +63,7 @@ public class User implements UserDetails {
     return new User.Builder().username(username).password(password).balance(balance).id(id);
   }
 
-  @Id
-  @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-  private String id;
+  @Id private String id;
 
   @Column(unique = true)
   @NotBlank

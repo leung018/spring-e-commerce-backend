@@ -44,6 +44,9 @@ class UserTest {
 
     assertThrowValidationException(userBuilder().password(null));
     assertThrowValidationException(userBuilder().password(""));
+
+    assertThrowValidationException(userBuilder().balance(new BigDecimal("-1")));
+    userBuilder().balance(BigDecimal.ZERO).build();
   }
 
   private void assertThrowValidationException(User.Builder builder) {
