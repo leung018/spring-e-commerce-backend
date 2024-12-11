@@ -1,5 +1,6 @@
 package com.leungcheng.spring_simple_backend;
 
+import static com.leungcheng.spring_simple_backend.testutil.CustomAssertions.assertBigDecimalEquals;
 import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -11,7 +12,6 @@ import com.leungcheng.spring_simple_backend.domain.User;
 import com.leungcheng.spring_simple_backend.domain.UserRepository;
 import com.leungcheng.spring_simple_backend.validation.ObjectValidator.ObjectValidationException;
 import java.math.BigDecimal;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +30,7 @@ class SpringSimpleBackendApplicationTests {
   @Autowired private ProductRepository productRepository;
   @Autowired private UserRepository userRepository;
 
-  private Optional<String> accessToken = Optional.empty();
+  private String accessToken = "";
 
   @BeforeEach
   public void setup() {
@@ -39,11 +39,15 @@ class SpringSimpleBackendApplicationTests {
   }
 
   private void setAccessToken(String token) {
-    this.accessToken = Optional.of(token);
+    this.accessToken = token;
   }
 
   private void clearAccessToken() {
-    this.accessToken = Optional.empty();
+    this.accessToken = "";
+  }
+
+  private boolean isAccessTokenSet() {
+    return !this.accessToken.isEmpty();
   }
 
   private String useNewUserAccessToken() throws Exception {
@@ -85,13 +89,15 @@ class SpringSimpleBackendApplicationTests {
   void shouldIgnoreIdWhenCreateProduct() throws Exception {
     useNewUserAccessToken();
 
+    MockHttpServletRequestBuilder request =
+        post("/products")
+            .contentType("application/json")
+            .content(
+                "{\"id\": \"should-be-ignored\", \"name\": \"Product 1\", \"price\": 1.0, \"quantity\": 50}");
+    addAuthHeader(request);
+
     mockMvc
-        .perform(
-            post("/products")
-                .contentType("application/json")
-                .header("Authorization", "Bearer " + accessToken.orElseThrow())
-                .content(
-                    "{\"id\": \"should-be-ignored\", \"name\": \"Product 1\", \"price\": 1.0, \"quantity\": 50}"))
+        .perform(request)
         .andExpect(status().isCreated())
         .andExpect(jsonPath("$.id", not("should-be-ignored")));
   }
@@ -203,7 +209,7 @@ class SpringSimpleBackendApplicationTests {
         .perform(
             post("/products")
                 .contentType("application/json")
-                .header("Authorization", "NotBearer " + accessToken.orElseThrow())
+                .header("Authorization", "NotBearer " + accessToken)
                 .content(CreateProductParams.sample().toContent()))
         .andExpect(status().isForbidden());
 
@@ -235,14 +241,16 @@ class SpringSimpleBackendApplicationTests {
     String token = JsonPath.read(result.getResponse().getContentAsString(), "$.accessToken");
     setAccessToken(token);
 
-    getAccountInfo()
-        .andExpect(status().isOk())
-        .andExpect(
-            jsonPath("$.balance")
-                .value(
-                    "100.0")) // FIXME: not hardcoding it. Perhaps move INITIAL_BALANCE to sth that
-        // can be accessed by tests
-        .andExpect(jsonPath("$.username").value(userCredentials.username));
+    result =
+        getAccountInfo()
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.username").value(userCredentials.username))
+            .andReturn();
+
+    BigDecimal actualBalance =
+        BigDecimal.valueOf(
+            (Double) JsonPath.read(result.getResponse().getContentAsString(), "$.balance"));
+    assertBigDecimalEquals(User.INITIAL_BALANCE, actualBalance);
   }
 
   private static class CreateProductParams {
@@ -274,13 +282,13 @@ class SpringSimpleBackendApplicationTests {
   private ResultActions createProduct(CreateProductParams params) throws Exception {
     MockHttpServletRequestBuilder builder =
         post("/products").contentType("application/json").content(params.toContent());
-    this.accessToken.ifPresent(s -> builder.header("Authorization", "Bearer " + s));
+    addAuthHeader(builder);
     return mockMvc.perform(builder);
   }
 
   private ResultActions getProduct(String id) throws Exception {
     MockHttpServletRequestBuilder builder = get("/products/" + id);
-    this.accessToken.ifPresent(s -> builder.header("Authorization", "Bearer " + s));
+    addAuthHeader(builder);
     return mockMvc.perform(builder);
   }
 
@@ -314,7 +322,13 @@ class SpringSimpleBackendApplicationTests {
 
   private ResultActions getAccountInfo() throws Exception {
     MockHttpServletRequestBuilder builder = get("/me");
-    this.accessToken.ifPresent(s -> builder.header("Authorization", "Bearer " + s));
+    addAuthHeader(builder);
     return mockMvc.perform(builder);
+  }
+
+  private void addAuthHeader(MockHttpServletRequestBuilder builder) {
+    if (isAccessTokenSet()) {
+      builder.header("Authorization", "Bearer " + this.accessToken);
+    }
   }
 }
