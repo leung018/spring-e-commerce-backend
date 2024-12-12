@@ -1,5 +1,6 @@
 package com.leungcheng.spring_simple_backend;
 
+import static com.leungcheng.spring_simple_backend.domain.order.PurchaseItems.INVALID_QUANTITY_MSG;
 import static com.leungcheng.spring_simple_backend.testutil.CustomAssertions.assertBigDecimalEquals;
 import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -296,7 +297,9 @@ class SpringSimpleBackendApplicationTests {
     CreateOrderParams createOrderParams =
         new CreateOrderParams("request-001", ImmutableMap.of(productId, -1));
 
-    createOrder(createOrderParams).andExpect(status().isBadRequest());
+    createOrder(createOrderParams)
+        .andExpect(status().isBadRequest())
+        .andExpect(content().string(INVALID_QUANTITY_MSG));
   }
 
   private static class CreateProductParams {

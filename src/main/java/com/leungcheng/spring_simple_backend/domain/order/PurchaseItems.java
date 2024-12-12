@@ -7,6 +7,8 @@ import java.util.Map;
 
 @Embeddable
 public class PurchaseItems {
+  public static String INVALID_QUANTITY_MSG = "Quantity must be greater than 0";
+
   @ElementCollection(fetch = FetchType.EAGER)
   @CollectionTable(
       name = "purchase_items",
@@ -17,7 +19,7 @@ public class PurchaseItems {
 
   public void setPurchaseItem(String productId, int quantity) {
     if (quantity < 1) {
-      throw new MyIllegalArgumentException("Quantity must be greater than 0");
+      throw new MyIllegalArgumentException(INVALID_QUANTITY_MSG);
     }
     productIdToQuantity.put(productId, quantity);
   }
