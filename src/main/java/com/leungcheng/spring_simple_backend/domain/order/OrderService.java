@@ -5,6 +5,7 @@ import com.leungcheng.spring_simple_backend.domain.Product;
 import com.leungcheng.spring_simple_backend.domain.ProductRepository;
 import com.leungcheng.spring_simple_backend.domain.User;
 import com.leungcheng.spring_simple_backend.domain.UserRepository;
+import com.leungcheng.spring_simple_backend.validation.MyIllegalArgumentException;
 import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Optional;
@@ -20,7 +21,14 @@ public class OrderService {
   private @Autowired ProductRepository productRepository;
   private @Autowired OrderRepository orderRepository;
 
-  public static class CreateOrderException extends IllegalArgumentException {
+  public static class CreateOrderException extends MyIllegalArgumentException {
+    // Add this static method to reduce duplication because one test in api level is interested in
+    // this message. But it may not be necessary to move other error messages to this class until we
+    // need them.
+    public static String insufficientStockMsg(String productId) {
+      return "Insufficient stock for product: " + productId;
+    }
+
     public CreateOrderException(String message) {
       super(message);
     }
@@ -84,7 +92,7 @@ public class OrderService {
 
   private void reduceProductStock(Product product, int purchaseQuantity) {
     if (purchaseQuantity > product.getQuantity()) {
-      throw new CreateOrderException("Insufficient stock for product: " + product.getId());
+      throw new CreateOrderException(CreateOrderException.insufficientStockMsg(product.getId()));
     }
     int newQuantity = product.getQuantity() - purchaseQuantity;
     Product updatedProduct = product.toBuilder().quantity(newQuantity).build();
