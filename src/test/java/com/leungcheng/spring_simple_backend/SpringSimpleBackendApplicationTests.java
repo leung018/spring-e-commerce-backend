@@ -285,6 +285,20 @@ class SpringSimpleBackendApplicationTests {
         .andExpect(jsonPath("$.buyerUserId").value(userId));
   }
 
+  @Test
+  void shouldCreateOrderApiHandleExceptionDueToNegativeQuantity() throws Exception {
+    String userId = useNewUserAccessToken();
+
+    CreateProductParams productParams = CreateProductParams.sample();
+    MvcResult result = createProduct(productParams).andReturn();
+    String productId = JsonPath.read(result.getResponse().getContentAsString(), "$.id");
+
+    CreateOrderParams createOrderParams =
+        new CreateOrderParams("request-001", ImmutableMap.of(productId, -1));
+
+    createOrder(createOrderParams).andExpect(status().isBadRequest());
+  }
+
   private static class CreateProductParams {
     String name;
     String price;
