@@ -326,17 +326,17 @@ class SpringSimpleBackendApplicationTests {
     String price;
     int quantity;
 
-    private static CreateProductParams sample() {
+    static CreateProductParams sample() {
       return new CreateProductParams("Product 1", "10", 50);
     }
 
-    private CreateProductParams(String name, String price, int quantity) {
+    CreateProductParams(String name, String price, int quantity) {
       this.name = name;
       this.price = price;
       this.quantity = quantity;
     }
 
-    public String toContent() {
+    String toContent() {
       return "{\"name\": \""
           + this.name
           + "\", \"price\": "
@@ -364,16 +364,16 @@ class SpringSimpleBackendApplicationTests {
     String username;
     String password;
 
-    private static UserCredentials sample() {
+    static UserCredentials sample() {
       return new UserCredentials("user001", "sample-password");
     }
 
-    private UserCredentials(String username, String password) {
+    UserCredentials(String username, String password) {
       this.username = username;
       this.password = password;
     }
 
-    public String toContent() {
+    String toContent() {
       return "{\"username\": \"" + this.username + "\", \"password\": \"" + this.password + "\"}";
     }
   }
