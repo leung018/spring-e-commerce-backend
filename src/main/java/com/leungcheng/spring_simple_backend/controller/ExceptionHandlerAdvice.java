@@ -1,5 +1,6 @@
 package com.leungcheng.spring_simple_backend.controller;
 
+import com.leungcheng.spring_simple_backend.validation.MyIllegalArgumentException;
 import com.leungcheng.spring_simple_backend.validation.ObjectValidator.ObjectValidationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
@@ -20,6 +21,12 @@ class ExceptionHandlerAdvice {
   @ExceptionHandler(UsernameAlreadyExistsException.class)
   @ResponseStatus(HttpStatus.CONFLICT)
   String usernameAlreadyExistsHandler(UsernameAlreadyExistsException ex) {
+    return ex.getMessage();
+  }
+
+  @ExceptionHandler(MyIllegalArgumentException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  String myIllegalArgumentExceptionHandler(MyIllegalArgumentException ex) {
     return ex.getMessage();
   }
 
