@@ -12,6 +12,7 @@ import com.leungcheng.spring_simple_backend.domain.Product;
 import com.leungcheng.spring_simple_backend.domain.ProductRepository;
 import com.leungcheng.spring_simple_backend.domain.User;
 import com.leungcheng.spring_simple_backend.domain.UserRepository;
+import com.leungcheng.spring_simple_backend.domain.order.OrderService;
 import com.leungcheng.spring_simple_backend.validation.ObjectValidator.ObjectValidationException;
 import java.math.BigDecimal;
 import java.util.stream.Collectors;
@@ -316,7 +317,8 @@ class SpringSimpleBackendApplicationTests {
 
     createOrder(createOrderParams)
         .andExpect(status().isBadRequest())
-        .andExpect(content().string("Insufficient stock for product: " + productId));
+        .andExpect(
+            content().string(OrderService.CreateOrderException.insufficientStockMsg(productId)));
   }
 
   private static class CreateProductParams {
