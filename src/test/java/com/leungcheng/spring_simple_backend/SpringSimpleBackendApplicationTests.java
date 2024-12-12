@@ -288,7 +288,7 @@ class SpringSimpleBackendApplicationTests {
 
   @Test
   void shouldCreateOrderApiHandleExceptionDueToNegativeQuantity() throws Exception {
-    String userId = useNewUserAccessToken();
+    useNewUserAccessToken();
 
     CreateProductParams productParams = CreateProductParams.sample();
     MvcResult result = createProduct(productParams).andReturn();
