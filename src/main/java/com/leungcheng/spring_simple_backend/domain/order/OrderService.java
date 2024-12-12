@@ -5,6 +5,7 @@ import com.leungcheng.spring_simple_backend.domain.Product;
 import com.leungcheng.spring_simple_backend.domain.ProductRepository;
 import com.leungcheng.spring_simple_backend.domain.User;
 import com.leungcheng.spring_simple_backend.domain.UserRepository;
+import com.leungcheng.spring_simple_backend.validation.MyIllegalArgumentException;
 import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Optional;
@@ -20,7 +21,7 @@ public class OrderService {
   private @Autowired ProductRepository productRepository;
   private @Autowired OrderRepository orderRepository;
 
-  public static class CreateOrderException extends IllegalArgumentException {
+  public static class CreateOrderException extends MyIllegalArgumentException {
     public CreateOrderException(String message) {
       super(message);
     }

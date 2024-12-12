@@ -302,6 +302,23 @@ class SpringSimpleBackendApplicationTests {
         .andExpect(content().string(INVALID_QUANTITY_MSG));
   }
 
+  @Test
+  void shouldCreateOrderApiHandleCreateOrderExceptionFromOrderService() throws Exception {
+    useNewUserAccessToken();
+
+    CreateProductParams productParams = CreateProductParams.sample();
+    productParams.quantity = 0;
+    MvcResult result = createProduct(productParams).andReturn();
+    String productId = JsonPath.read(result.getResponse().getContentAsString(), "$.id");
+
+    CreateOrderParams createOrderParams =
+        new CreateOrderParams("request-001", ImmutableMap.of(productId, 1));
+
+    createOrder(createOrderParams)
+        .andExpect(status().isBadRequest())
+        .andExpect(content().string("Insufficient stock for product: " + productId));
+  }
+
   private static class CreateProductParams {
     String name;
     String price;
