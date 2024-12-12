@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.google.common.collect.ImmutableMap;
+import com.leungcheng.spring_simple_backend.validation.MyIllegalArgumentException;
 import org.junit.jupiter.api.Test;
 
 class PurchaseItemsTest {
@@ -32,9 +33,9 @@ class PurchaseItemsTest {
     PurchaseItems purchaseItems = new PurchaseItems();
 
     assertThrows(
-        IllegalArgumentException.class, () -> purchaseItems.setPurchaseItem("product_id", 0));
+        MyIllegalArgumentException.class, () -> purchaseItems.setPurchaseItem("product_id", 0));
     assertThrows(
-        IllegalArgumentException.class, () -> purchaseItems.setPurchaseItem("product_id", -1));
+        MyIllegalArgumentException.class, () -> purchaseItems.setPurchaseItem("product_id", -1));
 
     ImmutableMap<String, Integer> map = purchaseItems.getProductIdToQuantity();
     assertEquals(0, map.size());

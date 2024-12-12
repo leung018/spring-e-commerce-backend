@@ -1,6 +1,7 @@
 package com.leungcheng.spring_simple_backend.domain.order;
 
 import com.google.common.collect.ImmutableMap;
+import com.leungcheng.spring_simple_backend.validation.MyIllegalArgumentException;
 import jakarta.persistence.*;
 import java.util.Map;
 
@@ -16,7 +17,7 @@ public class PurchaseItems {
 
   public void setPurchaseItem(String productId, int quantity) {
     if (quantity < 1) {
-      throw new IllegalArgumentException("Quantity must be greater than 0");
+      throw new MyIllegalArgumentException("Quantity must be greater than 0");
     }
     productIdToQuantity.put(productId, quantity);
   }
