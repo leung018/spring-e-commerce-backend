@@ -72,7 +72,7 @@ public class User implements UserDetails {
   @NotBlank private String password;
 
   @Min(0)
-  @Column(precision = 19, scale = 10)
+  @Column(precision = BigDecimalSettings.PRECISION, scale = BigDecimalSettings.SCALE)
   private BigDecimal balance;
 
   @Override
