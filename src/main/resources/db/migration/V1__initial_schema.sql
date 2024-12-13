@@ -47,6 +47,6 @@ CREATE
             ) NOT NULL,
             id VARCHAR(36) NOT NULL,
             password VARCHAR(60) NOT NULL,
-            username VARCHAR(20) NOT NULL UNIQUE,
+            username VARCHAR(50) NOT NULL UNIQUE,
             PRIMARY KEY(id)
         );
