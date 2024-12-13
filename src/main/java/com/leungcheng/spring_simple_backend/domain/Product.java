@@ -72,7 +72,7 @@ public class Product {
 
   @NotBlank private String name;
 
-  @Column(precision = 19, scale = 5)
+  @Column(precision = BigDecimalSettings.PRECISION, scale = BigDecimalSettings.SCALE)
   @Min(0)
   private BigDecimal price;
 
