@@ -26,6 +26,10 @@ spotless {
 		formatAnnotations()
 		removeUnusedImports()
 	}
+	sql {
+		target 'src/main/resources/db/migration/*.sql'
+		dbeaver()
+	}
 }
 
 repositories {
