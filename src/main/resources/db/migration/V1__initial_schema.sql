@@ -17,12 +17,8 @@ CREATE
             price NUMERIC(
                 19,
                 10
-            ) CHECK(
-                price >= 0
             ),
-            quantity INTEGER NOT NULL CHECK(
-                quantity >= 0
-            ),
+            quantity INTEGER NOT NULL,
             id VARCHAR(36) NOT NULL,
             name VARCHAR(255) NOT NULL,
             user_id VARCHAR(36),
@@ -47,8 +43,6 @@ CREATE
             balance NUMERIC(
                 19,
                 10
-            ) CHECK(
-                balance >= 0
             ),
             id VARCHAR(36) NOT NULL,
             password VARCHAR(60) NOT NULL,
