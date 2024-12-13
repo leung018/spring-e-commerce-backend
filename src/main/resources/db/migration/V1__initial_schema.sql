@@ -34,7 +34,8 @@ CREATE
             PRIMARY KEY(
                 order_id,
                 product_id
-            )
+            ),
+            CONSTRAINT FK_purchase_items_order_id FOREIGN KEY(order_id) REFERENCES orders(id)
         );
 
 CREATE
@@ -49,6 +50,3 @@ CREATE
             username VARCHAR(20) NOT NULL UNIQUE,
             PRIMARY KEY(id)
         );
-
-ALTER TABLE
-    IF EXISTS purchase_items ADD CONSTRAINT FKdcec4w10xea9gqcsp3wqns9tc FOREIGN KEY(order_id) REFERENCES orders;
