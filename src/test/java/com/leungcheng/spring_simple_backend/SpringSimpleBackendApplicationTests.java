@@ -109,7 +109,7 @@ class SpringSimpleBackendApplicationTests {
   @Test
   void shouldHandleObjectValidationException_AndIncludeTheProperInfoInTheResponse()
       throws Exception {
-    useNewUserAccessToken();
+    String userId = useNewUserAccessToken();
 
     CreateProductParams params = CreateProductParams.sample();
     params.price = "-1";
@@ -120,6 +120,7 @@ class SpringSimpleBackendApplicationTests {
       new Product.Builder()
           .name(params.name)
           .price(new BigDecimal(params.price))
+          .userId(userId)
           .quantity(params.quantity)
           .build();
     } catch (ObjectValidationException ex) {
