@@ -55,6 +55,9 @@ class ProductTest {
 
     assertThrowValidationException(productBuilder().name(""));
     assertThrowValidationException(productBuilder().name(null));
+
+    assertThrowValidationException(productBuilder().userId(""));
+    assertThrowValidationException(productBuilder().userId(null));
   }
 
   private void assertThrowValidationException(Product.Builder builder) {
