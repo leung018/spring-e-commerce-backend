@@ -5,6 +5,7 @@ import com.leungcheng.spring_simple_backend.domain.order.Order;
 import com.leungcheng.spring_simple_backend.domain.order.OrderService;
 import com.leungcheng.spring_simple_backend.domain.order.PurchaseItems;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,5 +31,6 @@ public class OrderController {
     return orderService.createOrder(userId, purchaseItems, createOrderRequest.requestId());
   }
 
-  public record CreateOrderRequest(String requestId, Map<String, Integer> productIdToQuantity) {}
+  public record CreateOrderRequest(
+      @Size(max = 36) String requestId, Map<String, Integer> productIdToQuantity) {}
 }

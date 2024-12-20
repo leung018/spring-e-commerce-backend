@@ -266,12 +266,10 @@ class SpringSimpleBackendApplicationTests {
     // Product 1
     productParams.price = "1";
     productParams.quantity = 99;
-    MvcResult result = createProduct(productParams).andReturn();
-    String product1Id = JsonPath.read(result.getResponse().getContentAsString(), "$.id");
+    String product1Id = createProductAndGetId(productParams);
 
     // Product 2
-    result = createProduct(productParams).andReturn();
-    String product2Id = JsonPath.read(result.getResponse().getContentAsString(), "$.id");
+    String product2Id = createProductAndGetId(productParams);
 
     // Create Order
     CreateOrderParams createOrderParams =
@@ -288,12 +286,26 @@ class SpringSimpleBackendApplicationTests {
   }
 
   @Test
+  void shouldCreateOrderRejectTooLongRequestId() throws Exception {
+    useNewUserAccessToken();
+
+    CreateProductParams productParams = CreateProductParams.sample();
+    productParams.price = "1";
+    productParams.quantity = 99;
+    String productId = createProductAndGetId(productParams);
+
+    CreateOrderParams createOrderParams =
+        new CreateOrderParams("1".repeat(37), ImmutableMap.of(productId, 1));
+
+    createOrder(createOrderParams).andExpect(status().isBadRequest());
+  }
+
+  @Test
   void shouldCreateOrderApiHandleExceptionDueToNegativeQuantity() throws Exception {
     useNewUserAccessToken();
 
     CreateProductParams productParams = CreateProductParams.sample();
-    MvcResult result = createProduct(productParams).andReturn();
-    String productId = JsonPath.read(result.getResponse().getContentAsString(), "$.id");
+    String productId = createProductAndGetId(productParams);
 
     CreateOrderParams createOrderParams =
         new CreateOrderParams("request-001", ImmutableMap.of(productId, -1));
@@ -309,8 +321,7 @@ class SpringSimpleBackendApplicationTests {
 
     CreateProductParams productParams = CreateProductParams.sample();
     productParams.quantity = 0;
-    MvcResult result = createProduct(productParams).andReturn();
-    String productId = JsonPath.read(result.getResponse().getContentAsString(), "$.id");
+    String productId = createProductAndGetId(productParams);
 
     CreateOrderParams createOrderParams =
         new CreateOrderParams("request-001", ImmutableMap.of(productId, 1));
@@ -352,6 +363,11 @@ class SpringSimpleBackendApplicationTests {
         post("/products").contentType("application/json").content(params.toContent());
     addAuthHeader(builder);
     return mockMvc.perform(builder);
+  }
+
+  private String createProductAndGetId(CreateProductParams params) throws Exception {
+    MvcResult result = createProduct(params).andReturn();
+    return JsonPath.read(result.getResponse().getContentAsString(), "$.id");
   }
 
   private ResultActions getProduct(String id) throws Exception {
