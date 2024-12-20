@@ -288,6 +288,22 @@ class SpringSimpleBackendApplicationTests {
   }
 
   @Test
+  void shouldCreateOrderRejectTooLongRequestId() throws Exception {
+    useNewUserAccessToken();
+
+    CreateProductParams productParams = CreateProductParams.sample();
+    productParams.price = "1";
+    productParams.quantity = 99;
+    MvcResult result = createProduct(productParams).andReturn();
+    String productId = JsonPath.read(result.getResponse().getContentAsString(), "$.id");
+
+    CreateOrderParams createOrderParams =
+        new CreateOrderParams("1".repeat(37), ImmutableMap.of(productId, 1));
+
+    createOrder(createOrderParams).andExpect(status().isBadRequest());
+  }
+
+  @Test
   void shouldCreateOrderApiHandleExceptionDueToNegativeQuantity() throws Exception {
     useNewUserAccessToken();
 
