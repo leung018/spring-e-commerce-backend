@@ -68,7 +68,7 @@ public class Product {
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
   private String id;
 
-  private String userId;
+  @NotBlank private String userId;
 
   @NotBlank private String name;
 
