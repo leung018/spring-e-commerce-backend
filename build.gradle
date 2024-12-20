@@ -26,6 +26,10 @@ spotless {
 		formatAnnotations()
 		removeUnusedImports()
 	}
+	sql {
+		target 'src/main/resources/db/migration/*.sql'
+		dbeaver()
+	}
 }
 
 repositories {
@@ -36,11 +40,12 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	implementation 'com.h2database:h2' // TODO: Use it in test while use postgres in production
+	runtimeOnly 'org.postgresql:postgresql'
 	implementation "org.springframework.boot:spring-boot-starter-security"
 	implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
 	implementation "com.google.guava:guava:33.3.1-jre"
 	implementation "org.springframework.retry:spring-retry"
+	implementation 'org.flywaydb:flyway-database-postgresql'
 	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -51,4 +56,28 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+tasks.register("runDb") {
+	description = "Run the database in a container."
+	doLast {
+		exec {
+			commandLine 'docker', 'compose', 'up', '-d', 'postgres'
+		}
+	}
+}
+
+tasks.register("cleanDb") {
+	description = "Stop and remove the database container and volumes."
+	doLast {
+		exec {
+			commandLine 'docker', 'compose', 'down', '-v', 'postgres'
+		}
+	}
+}
+
+tasks.register("testLocal") {
+	description = "Start the database container if needed and run the tests."
+	dependsOn tasks.named("runDb")
+	finalizedBy tasks.named("test")
 }
