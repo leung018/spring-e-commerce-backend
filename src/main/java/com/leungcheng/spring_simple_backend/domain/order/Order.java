@@ -1,7 +1,6 @@
 package com.leungcheng.spring_simple_backend.domain.order;
 
 import jakarta.persistence.*;
-
 import java.util.UUID;
 
 @Entity
@@ -9,7 +8,7 @@ import java.util.UUID;
     name = "orders",
     uniqueConstraints = {@UniqueConstraint(columnNames = {"requestId", "buyerUserId"})})
 public class Order {
-  @Id private final String id = java.util.UUID.randomUUID().toString();
+  @Id private final UUID id = UUID.randomUUID();
   private UUID buyerUserId;
   private PurchaseItems purchaseItems;
 
@@ -23,7 +22,7 @@ public class Order {
     this.requestId = requestId;
   }
 
-  public String getId() {
+  public UUID getId() {
     return id;
   }
 
