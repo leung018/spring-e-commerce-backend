@@ -5,7 +5,6 @@ import com.leungcheng.spring_simple_backend.domain.order.Order;
 import com.leungcheng.spring_simple_backend.domain.order.OrderService;
 import com.leungcheng.spring_simple_backend.domain.order.PurchaseItems;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Size;
 import java.util.Map;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,5 +32,5 @@ public class OrderController {
   }
 
   public record CreateOrderRequest(
-      @Size(max = 36) String requestId, Map<UUID, Integer> productIdToQuantity) {}
+      UUID requestId, Map<UUID, Integer> productIdToQuantity) {}
 }

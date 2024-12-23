@@ -276,8 +276,9 @@ class SpringSimpleBackendApplicationTests {
     String product2Id = createProductAndGetId(productParams);
 
     // Create Order
+    String requestId = UUID.randomUUID().toString();
     CreateOrderParams createOrderParams =
-        new CreateOrderParams("request-001", ImmutableMap.of(product1Id, 4, product2Id, 5));
+        new CreateOrderParams(requestId, ImmutableMap.of(product1Id, 4, product2Id, 5));
 
     createOrder(createOrderParams)
         .andExpect(status().isCreated())
@@ -285,7 +286,7 @@ class SpringSimpleBackendApplicationTests {
         .andExpect(jsonPath("$.purchaseItems").exists())
         .andExpect(jsonPath("$.purchaseItems.productIdToQuantity." + product1Id).value(4))
         .andExpect(jsonPath("$.purchaseItems.productIdToQuantity." + product2Id).value(5))
-        .andExpect(jsonPath("$.requestId").value("request-001"))
+        .andExpect(jsonPath("$.requestId").value(requestId))
         .andExpect(jsonPath("$.buyerUserId").value(userId.toString()));
   }
 
@@ -311,8 +312,7 @@ class SpringSimpleBackendApplicationTests {
     CreateProductParams productParams = CreateProductParams.sample();
     String productId = createProductAndGetId(productParams);
 
-    CreateOrderParams createOrderParams =
-        new CreateOrderParams("request-001", ImmutableMap.of(productId, -1));
+    CreateOrderParams createOrderParams = new CreateOrderParams(ImmutableMap.of(productId, -1));
 
     createOrder(createOrderParams)
         .andExpect(status().isBadRequest())
@@ -327,8 +327,7 @@ class SpringSimpleBackendApplicationTests {
     productParams.quantity = 0;
     String productId = createProductAndGetId(productParams);
 
-    CreateOrderParams createOrderParams =
-        new CreateOrderParams("request-001", ImmutableMap.of(productId, 1));
+    CreateOrderParams createOrderParams = new CreateOrderParams(ImmutableMap.of(productId, 1));
 
     createOrder(createOrderParams)
         .andExpect(status().isBadRequest())
@@ -431,6 +430,10 @@ class SpringSimpleBackendApplicationTests {
     CreateOrderParams(String requestId, ImmutableMap<String, Integer> productIdToQuantity) {
       this.requestId = requestId;
       this.productIdToQuantity = productIdToQuantity;
+    }
+
+    CreateOrderParams(ImmutableMap<String, Integer> productIdToQuantity) {
+      this(UUID.randomUUID().toString(), productIdToQuantity);
     }
 
     String toContent() {

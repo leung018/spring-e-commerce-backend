@@ -12,11 +12,11 @@ public class Order {
   private UUID buyerUserId;
   private PurchaseItems purchaseItems;
 
-  private String requestId;
+  private UUID requestId;
 
   private Order() {}
 
-  Order(UUID buyerUserId, PurchaseItems purchaseItems, String requestId) {
+  Order(UUID buyerUserId, PurchaseItems purchaseItems, UUID requestId) {
     this.buyerUserId = buyerUserId;
     this.purchaseItems = purchaseItems;
     this.requestId = requestId;
@@ -34,7 +34,7 @@ public class Order {
     return purchaseItems;
   }
 
-  public String getRequestId() {
+  public UUID getRequestId() {
     return requestId;
   }
 }

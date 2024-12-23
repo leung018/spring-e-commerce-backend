@@ -37,7 +37,7 @@ public class OrderService {
 
   @Retryable(noRetryFor = CreateOrderException.class)
   @Transactional(isolation = Isolation.SERIALIZABLE)
-  public Order createOrder(UUID buyerUserId, PurchaseItems purchaseItems, String requestId) {
+  public Order createOrder(UUID buyerUserId, PurchaseItems purchaseItems, UUID requestId) {
     Optional<Order> order = orderRepository.findByBuyerUserIdAndRequestId(buyerUserId, requestId);
     if (order.isPresent()) {
       return order.get();
@@ -65,7 +65,7 @@ public class OrderService {
     userRepository.save(updatedBuyer);
   }
 
-  private Order addNewOrder(UUID buyerUserId, PurchaseItems purchaseItems, String requestId) {
+  private Order addNewOrder(UUID buyerUserId, PurchaseItems purchaseItems, UUID requestId) {
     Order order = new Order(buyerUserId, purchaseItems, requestId);
     return orderRepository.save(order);
   }

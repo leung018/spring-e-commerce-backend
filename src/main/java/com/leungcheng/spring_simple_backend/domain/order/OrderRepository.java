@@ -5,5 +5,5 @@ import java.util.UUID;
 import org.springframework.data.repository.CrudRepository;
 
 public interface OrderRepository extends CrudRepository<Order, UUID> {
-  Optional<Order> findByBuyerUserIdAndRequestId(UUID buyerUserId, String requestId);
+  Optional<Order> findByBuyerUserIdAndRequestId(UUID buyerUserId, UUID requestId);
 }

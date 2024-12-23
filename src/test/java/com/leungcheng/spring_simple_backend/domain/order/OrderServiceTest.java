@@ -40,6 +40,9 @@ class OrderServiceTest {
 
   private final User seedSeller = uniqueUsernameUserBuilder().build();
 
+  private final UUID seedRequestId1 = UUID.randomUUID();
+  private final UUID seedRequestId2 = UUID.randomUUID();
+
   @BeforeEach
   void setUp() {
     orderRepository.deleteAll();
@@ -229,8 +232,8 @@ class OrderServiceTest {
     PurchaseItems purchaseItems = new PurchaseItems();
     purchaseItems.setPurchaseItem(product.getId(), 1);
 
-    Order order1 = createOrder(buyer.getId(), purchaseItems, "request-01");
-    Order order2 = createOrder(buyer.getId(), purchaseItems, "request-02");
+    Order order1 = createOrder(buyer.getId(), purchaseItems, seedRequestId1);
+    Order order2 = createOrder(buyer.getId(), purchaseItems, seedRequestId2);
 
     assertNotEquals(order1.getId(), order2.getId());
   }
@@ -246,8 +249,8 @@ class OrderServiceTest {
     PurchaseItems purchaseItems = new PurchaseItems();
     purchaseItems.setPurchaseItem(product.getId(), 1);
 
-    Order order1 = createOrder(buyer.getId(), purchaseItems, "request_id");
-    Order order2 = createOrder(buyer.getId(), purchaseItems, "request_id");
+    Order order1 = createOrder(buyer.getId(), purchaseItems, seedRequestId1);
+    Order order2 = createOrder(buyer.getId(), purchaseItems, seedRequestId1);
 
     assertOrderEquals(order2, order1);
     assertEquals(4, productRepository.findById(product.getId()).orElseThrow().getQuantity());
@@ -267,8 +270,8 @@ class OrderServiceTest {
     PurchaseItems purchaseItems = new PurchaseItems();
     purchaseItems.setPurchaseItem(product.getId(), 1);
 
-    Order order1 = createOrder(buyer1.getId(), purchaseItems, "request_id");
-    Order order2 = createOrder(buyer2.getId(), purchaseItems, "request_id");
+    Order order1 = createOrder(buyer1.getId(), purchaseItems, seedRequestId1);
+    Order order2 = createOrder(buyer2.getId(), purchaseItems, seedRequestId1);
 
     assertNotEquals(order1.getId(), order2.getId());
   }
@@ -287,8 +290,8 @@ class OrderServiceTest {
     purchaseItems.setPurchaseItem(product.getId(), 1);
 
     // 2 threads try to buy the same product at the same time
-    Thread thread1 = new Thread(() -> createOrder(buyer.getId(), purchaseItems, "request-01"));
-    Thread thread2 = new Thread(() -> createOrder(buyer.getId(), purchaseItems, "request-02"));
+    Thread thread1 = new Thread(() -> createOrder(buyer.getId(), purchaseItems, seedRequestId1));
+    Thread thread2 = new Thread(() -> createOrder(buyer.getId(), purchaseItems, seedRequestId2));
 
     thread1.start();
     thread2.start();
@@ -304,10 +307,10 @@ class OrderServiceTest {
   }
 
   private Order createOrder(UUID buyerUserId, PurchaseItems purchaseItems) {
-    return orderService.createOrder(buyerUserId, purchaseItems, "dummy_request_id");
+    return orderService.createOrder(buyerUserId, purchaseItems, UUID.randomUUID());
   }
 
-  private Order createOrder(UUID buyerUserId, PurchaseItems purchaseItems, String requestId) {
+  private Order createOrder(UUID buyerUserId, PurchaseItems purchaseItems, UUID requestId) {
     return orderService.createOrder(buyerUserId, purchaseItems, requestId);
   }
 
