@@ -4,7 +4,6 @@ import com.leungcheng.spring_simple_backend.auth.UserAuthenticatedInfoToken;
 import com.leungcheng.spring_simple_backend.domain.User;
 import com.leungcheng.spring_simple_backend.domain.UserRepository;
 import java.math.BigDecimal;
-import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
