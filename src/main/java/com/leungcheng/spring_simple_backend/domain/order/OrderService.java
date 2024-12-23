@@ -10,7 +10,6 @@ import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
@@ -27,7 +26,7 @@ public class OrderService {
     // Add this static method to reduce duplication because one test in api level is interested in
     // this message. But it may not be necessary to move other error messages to this class until we
     // need them.
-    public static String insufficientStockMsg(String productId) {
+    public static String insufficientStockMsg(UUID productId) {
       return "Insufficient stock for product: " + productId;
     }
 
@@ -72,14 +71,14 @@ public class OrderService {
   }
 
   private BigDecimal processPurchaseItems(PurchaseItems purchaseItems) {
-    ImmutableMap<String, Integer> productIdToQuantity = purchaseItems.getProductIdToQuantity();
+    ImmutableMap<UUID, Integer> productIdToQuantity = purchaseItems.getProductIdToQuantity();
     if (productIdToQuantity.isEmpty()) {
       throw new CreateOrderException("Purchase items cannot be empty");
     }
 
     BigDecimal totalCost = BigDecimal.ZERO;
-    for (Map.Entry<String, Integer> entry : productIdToQuantity.entrySet()) {
-      String productId = entry.getKey();
+    for (Map.Entry<UUID, Integer> entry : productIdToQuantity.entrySet()) {
+      UUID productId = entry.getKey();
       int purchaseQuantity = entry.getValue();
       Product product = getProduct(productId);
 
@@ -108,7 +107,7 @@ public class OrderService {
     saveNewBalance(seller, newBalance);
   }
 
-  private Product getProduct(String productId) {
+  private Product getProduct(UUID productId) {
     return productRepository
         .findById(productId)
         .orElseThrow(() -> new CreateOrderException("Product: " + productId + " does not exist"));

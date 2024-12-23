@@ -80,12 +80,14 @@ class OrderServiceTest {
     User buyer = uniqueUsernameUserBuilder().build();
     userRepository.save(buyer);
 
+    UUID nonExistingProductId = UUID.randomUUID();
+
     PurchaseItems purchaseItems = new PurchaseItems();
-    purchaseItems.setPurchaseItem("non_existing_product_id", 1);
+    purchaseItems.setPurchaseItem(nonExistingProductId, 1);
 
     CreateOrderException exception =
         assertThrows(CreateOrderException.class, () -> createOrder(buyer.getId(), purchaseItems));
-    assertEquals("Product: non_existing_product_id does not exist", exception.getMessage());
+    assertEquals("Product: " + nonExistingProductId + " does not exist", exception.getMessage());
   }
 
   @Test

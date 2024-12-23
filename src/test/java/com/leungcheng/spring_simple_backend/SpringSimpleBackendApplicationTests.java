@@ -141,9 +141,11 @@ class SpringSimpleBackendApplicationTests {
   void shouldGet404WhenProductNotFound() throws Exception {
     useNewUserAccessToken();
 
-    getProduct("invalid-id")
+    UUID productId = UUID.randomUUID();
+
+    getProduct(productId.toString())
         .andExpect(status().isNotFound())
-        .andExpect(content().string("Could not find product invalid-id"));
+        .andExpect(content().string("Could not find product " + productId));
   }
 
   @Test
@@ -331,7 +333,10 @@ class SpringSimpleBackendApplicationTests {
     createOrder(createOrderParams)
         .andExpect(status().isBadRequest())
         .andExpect(
-            content().string(OrderService.CreateOrderException.insufficientStockMsg(productId)));
+            content()
+                .string(
+                    OrderService.CreateOrderException.insufficientStockMsg(
+                        UUID.fromString(productId))));
   }
 
   private static class CreateProductParams {

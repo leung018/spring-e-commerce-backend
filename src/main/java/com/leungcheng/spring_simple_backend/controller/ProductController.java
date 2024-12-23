@@ -5,6 +5,8 @@ import com.leungcheng.spring_simple_backend.domain.Product;
 import com.leungcheng.spring_simple_backend.domain.ProductRepository;
 import jakarta.validation.Valid;
 import java.math.BigDecimal;
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -29,7 +31,7 @@ public class ProductController {
   }
 
   @GetMapping("/products/{id}")
-  Product one(@PathVariable String id) {
+  Product one(@PathVariable UUID id) {
     return repository.findById(id).orElseThrow(() -> new ProductNotFoundException(id));
   }
 

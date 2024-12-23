@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import com.leungcheng.spring_simple_backend.validation.MyIllegalArgumentException;
 import jakarta.persistence.*;
 import java.util.Map;
+import java.util.UUID;
 
 @Embeddable
 public class PurchaseItems {
@@ -15,16 +16,16 @@ public class PurchaseItems {
       joinColumns = {@JoinColumn(name = "order_id", referencedColumnName = "id")})
   @MapKeyColumn(name = "product_id")
   @Column(name = "quantity")
-  private final Map<String, Integer> productIdToQuantity = new java.util.HashMap<>();
+  private final Map<UUID, Integer> productIdToQuantity = new java.util.HashMap<>();
 
-  public void setPurchaseItem(String productId, int quantity) {
+  public void setPurchaseItem(UUID productId, int quantity) {
     if (quantity < 1) {
       throw new MyIllegalArgumentException(INVALID_QUANTITY_MSG);
     }
     productIdToQuantity.put(productId, quantity);
   }
 
-  public ImmutableMap<String, Integer> getProductIdToQuantity() {
+  public ImmutableMap<UUID, Integer> getProductIdToQuantity() {
     return ImmutableMap.copyOf(productIdToQuantity);
   }
 }

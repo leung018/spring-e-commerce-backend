@@ -20,9 +20,9 @@ public class Product {
     private BigDecimal price;
     private int quantity;
     private UUID userId;
-    private String id = java.util.UUID.randomUUID().toString();
+    private UUID id = UUID.randomUUID();
 
-    private Builder id(String id) {
+    private Builder id(UUID id) {
       this.id = id;
       return this;
     }
@@ -68,7 +68,7 @@ public class Product {
 
   @Id
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-  private String id;
+  private UUID id;
 
   @NotNull private UUID userId;
 
@@ -81,7 +81,7 @@ public class Product {
   @Min(0)
   private int quantity;
 
-  public String getId() {
+  public UUID getId() {
     return id;
   }
 
