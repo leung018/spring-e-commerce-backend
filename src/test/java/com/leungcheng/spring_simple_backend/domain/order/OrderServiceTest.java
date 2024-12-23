@@ -11,6 +11,7 @@ import com.leungcheng.spring_simple_backend.domain.order.OrderService.CreateOrde
 import com.leungcheng.spring_simple_backend.testutil.DefaultBuilders;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,7 +59,7 @@ class OrderServiceTest {
 
     CreateOrderException exception =
         assertThrows(
-            CreateOrderException.class, () -> createOrder("non_existing_buyer_id", purchaseItems));
+            CreateOrderException.class, () -> createOrder(UUID.randomUUID(), purchaseItems));
     assertEquals("Buyer does not exist", exception.getMessage());
   }
 
@@ -300,11 +301,11 @@ class OrderServiceTest {
     assertEquals(0, productRepository.findById(product.getId()).orElseThrow().getQuantity());
   }
 
-  private Order createOrder(String buyerUserId, PurchaseItems purchaseItems) {
+  private Order createOrder(UUID buyerUserId, PurchaseItems purchaseItems) {
     return orderService.createOrder(buyerUserId, purchaseItems, "dummy_request_id");
   }
 
-  private Order createOrder(String buyerUserId, PurchaseItems purchaseItems, String requestId) {
+  private Order createOrder(UUID buyerUserId, PurchaseItems purchaseItems, String requestId) {
     return orderService.createOrder(buyerUserId, purchaseItems, requestId);
   }
 

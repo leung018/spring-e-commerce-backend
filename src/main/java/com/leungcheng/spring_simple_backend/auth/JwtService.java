@@ -40,7 +40,7 @@ public class JwtService {
 
   public String generateAccessToken(User user) {
     return Jwts.builder()
-        .subject(user.getId())
+        .subject(user.getId().toString())
         .expiration(getExpirationDate())
         .signWith(this.secretKey, Jwts.SIG.HS256)
         .compact();

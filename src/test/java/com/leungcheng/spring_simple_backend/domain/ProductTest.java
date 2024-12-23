@@ -5,23 +5,26 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.leungcheng.spring_simple_backend.validation.ObjectValidator;
 import java.math.BigDecimal;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
 class ProductTest {
 
   @Test
   void shouldCreateProduct() {
+    UUID userId = UUID.randomUUID();
+
     Product product =
         productBuilder()
             .name("Product 1")
             .price(new BigDecimal("1.0"))
             .quantity(50)
-            .userId("user_001")
+            .userId(userId)
             .build();
 
     assertEquals("Product 1", product.getName());
     assertEquals(new BigDecimal("1.0"), product.getPrice());
-    assertEquals("user_001", product.getUserId());
+    assertEquals(userId, product.getUserId());
     assertEquals(50, product.getQuantity());
   }
 
@@ -56,7 +59,6 @@ class ProductTest {
     assertThrowValidationException(productBuilder().name(""));
     assertThrowValidationException(productBuilder().name(null));
 
-    assertThrowValidationException(productBuilder().userId(""));
     assertThrowValidationException(productBuilder().userId(null));
   }
 

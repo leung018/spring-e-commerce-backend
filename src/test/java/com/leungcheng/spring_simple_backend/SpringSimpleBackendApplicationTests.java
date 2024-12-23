@@ -15,6 +15,7 @@ import com.leungcheng.spring_simple_backend.domain.UserRepository;
 import com.leungcheng.spring_simple_backend.domain.order.OrderService;
 import com.leungcheng.spring_simple_backend.validation.ObjectValidator.ObjectValidationException;
 import java.math.BigDecimal;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -54,7 +55,7 @@ class SpringSimpleBackendApplicationTests {
     return !this.accessToken.isEmpty();
   }
 
-  private String useNewUserAccessToken() throws Exception {
+  private UUID useNewUserAccessToken() throws Exception {
     UserCredentials userCredentials = UserCredentials.sample();
 
     signup(userCredentials).andExpect(status().isCreated());
@@ -109,7 +110,7 @@ class SpringSimpleBackendApplicationTests {
   @Test
   void shouldHandleObjectValidationException_AndIncludeTheProperInfoInTheResponse()
       throws Exception {
-    String userId = useNewUserAccessToken();
+    UUID userId = useNewUserAccessToken();
 
     CreateProductParams params = CreateProductParams.sample();
     params.price = "-1";
@@ -229,12 +230,12 @@ class SpringSimpleBackendApplicationTests {
 
   @Test
   void shouldCreateProductWithUserIdSameAsCreator() throws Exception {
-    String userId = useNewUserAccessToken();
+    UUID userId = useNewUserAccessToken();
 
     CreateProductParams params = CreateProductParams.sample();
     createProduct(params)
         .andExpect(status().isCreated())
-        .andExpect(jsonPath("$.userId").value(userId));
+        .andExpect(jsonPath("$.userId").value(userId.toString()));
   }
 
   @Test
@@ -260,7 +261,7 @@ class SpringSimpleBackendApplicationTests {
 
   @Test
   void shouldCreateOrder() throws Exception {
-    String userId = useNewUserAccessToken();
+    UUID userId = useNewUserAccessToken();
 
     CreateProductParams productParams = CreateProductParams.sample();
 
@@ -283,7 +284,7 @@ class SpringSimpleBackendApplicationTests {
         .andExpect(jsonPath("$.purchaseItems.productIdToQuantity." + product1Id).value(4))
         .andExpect(jsonPath("$.purchaseItems.productIdToQuantity." + product2Id).value(5))
         .andExpect(jsonPath("$.requestId").value("request-001"))
-        .andExpect(jsonPath("$.buyerUserId").value(userId));
+        .andExpect(jsonPath("$.buyerUserId").value(userId.toString()));
   }
 
   @Test

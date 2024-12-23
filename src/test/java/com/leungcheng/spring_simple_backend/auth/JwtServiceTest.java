@@ -40,7 +40,7 @@ class JwtServiceTest {
     String token = jwtService.generateAccessToken(user);
     UserAuthenticatedInfo userAuthenticatedInfo = jwtService.parseAccessToken(token);
 
-    assertEquals(user.getId(), userAuthenticatedInfo.userId());
+    assertEquals(user.getId().toString(), userAuthenticatedInfo.userId());
   }
 
   @Test

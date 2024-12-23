@@ -16,7 +16,7 @@ public class DefaultBuilders {
     return new Product.Builder()
         .name("Default Product")
         .price(new BigDecimal("0.1"))
-        .userId("user_01")
+        .userId(java.util.UUID.randomUUID())
         .quantity(1);
   }
 }

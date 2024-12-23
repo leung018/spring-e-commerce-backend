@@ -9,6 +9,8 @@ import com.leungcheng.spring_simple_backend.validation.MyIllegalArgumentExceptio
 import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
@@ -36,7 +38,7 @@ public class OrderService {
 
   @Retryable(noRetryFor = CreateOrderException.class)
   @Transactional(isolation = Isolation.SERIALIZABLE)
-  public Order createOrder(String buyerUserId, PurchaseItems purchaseItems, String requestId) {
+  public Order createOrder(UUID buyerUserId, PurchaseItems purchaseItems, String requestId) {
     Optional<Order> order = orderRepository.findByBuyerUserIdAndRequestId(buyerUserId, requestId);
     if (order.isPresent()) {
       return order.get();
@@ -55,7 +57,7 @@ public class OrderService {
     return addNewOrder(buyerUserId, purchaseItems, requestId);
   }
 
-  private Optional<User> getUser(String userId) {
+  private Optional<User> getUser(UUID userId) {
     return userRepository.findById(userId);
   }
 
@@ -64,7 +66,7 @@ public class OrderService {
     userRepository.save(updatedBuyer);
   }
 
-  private Order addNewOrder(String buyerUserId, PurchaseItems purchaseItems, String requestId) {
+  private Order addNewOrder(UUID buyerUserId, PurchaseItems purchaseItems, String requestId) {
     Order order = new Order(buyerUserId, purchaseItems, requestId);
     return orderRepository.save(order);
   }

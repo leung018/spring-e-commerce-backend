@@ -7,6 +7,7 @@ import com.leungcheng.spring_simple_backend.domain.order.PurchaseItems;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Size;
 import java.util.Map;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,7 +29,8 @@ public class OrderController {
     for (var entry : createOrderRequest.productIdToQuantity().entrySet()) {
       purchaseItems.setPurchaseItem(entry.getKey(), entry.getValue());
     }
-    return orderService.createOrder(userId, purchaseItems, createOrderRequest.requestId());
+    return orderService.createOrder(
+        UUID.fromString(userId), purchaseItems, createOrderRequest.requestId());
   }
 
   public record CreateOrderRequest(
