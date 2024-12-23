@@ -8,6 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
+import java.util.UUID;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import org.springframework.beans.factory.annotation.Value;
@@ -59,7 +60,7 @@ public class JwtService {
               .parseSignedClaims(token)
               .getPayload()
               .getSubject();
-      return new UserAuthenticatedInfo(userId);
+      return new UserAuthenticatedInfo(UUID.fromString(userId));
     } catch (Exception e) {
       if (e instanceof ExpiredJwtException) {
         throw new InvalidTokenException("Expired token");
