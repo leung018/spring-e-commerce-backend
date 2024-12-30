@@ -9,6 +9,7 @@ import com.leungcheng.spring_simple_backend.validation.MyIllegalArgumentExceptio
 import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
@@ -25,7 +26,7 @@ public class OrderService {
     // Add this static method to reduce duplication because one test in api level is interested in
     // this message. But it may not be necessary to move other error messages to this class until we
     // need them.
-    public static String insufficientStockMsg(String productId) {
+    public static String insufficientStockMsg(UUID productId) {
       return "Insufficient stock for product: " + productId;
     }
 
@@ -36,7 +37,11 @@ public class OrderService {
 
   @Retryable(noRetryFor = CreateOrderException.class)
   @Transactional(isolation = Isolation.SERIALIZABLE)
-  public Order createOrder(String buyerUserId, PurchaseItems purchaseItems, String requestId) {
+  public Order createOrder(UUID buyerUserId, PurchaseItems purchaseItems, UUID requestId) {
+    if (requestId == null) {
+      throw new CreateOrderException("Request ID cannot be null");
+    }
+
     Optional<Order> order = orderRepository.findByBuyerUserIdAndRequestId(buyerUserId, requestId);
     if (order.isPresent()) {
       return order.get();
@@ -55,7 +60,7 @@ public class OrderService {
     return addNewOrder(buyerUserId, purchaseItems, requestId);
   }
 
-  private Optional<User> getUser(String userId) {
+  private Optional<User> getUser(UUID userId) {
     return userRepository.findById(userId);
   }
 
@@ -64,20 +69,20 @@ public class OrderService {
     userRepository.save(updatedBuyer);
   }
 
-  private Order addNewOrder(String buyerUserId, PurchaseItems purchaseItems, String requestId) {
+  private Order addNewOrder(UUID buyerUserId, PurchaseItems purchaseItems, UUID requestId) {
     Order order = new Order(buyerUserId, purchaseItems, requestId);
     return orderRepository.save(order);
   }
 
   private BigDecimal processPurchaseItems(PurchaseItems purchaseItems) {
-    ImmutableMap<String, Integer> productIdToQuantity = purchaseItems.getProductIdToQuantity();
+    ImmutableMap<UUID, Integer> productIdToQuantity = purchaseItems.getProductIdToQuantity();
     if (productIdToQuantity.isEmpty()) {
       throw new CreateOrderException("Purchase items cannot be empty");
     }
 
     BigDecimal totalCost = BigDecimal.ZERO;
-    for (Map.Entry<String, Integer> entry : productIdToQuantity.entrySet()) {
-      String productId = entry.getKey();
+    for (Map.Entry<UUID, Integer> entry : productIdToQuantity.entrySet()) {
+      UUID productId = entry.getKey();
       int purchaseQuantity = entry.getValue();
       Product product = getProduct(productId);
 
@@ -106,7 +111,7 @@ public class OrderService {
     saveNewBalance(seller, newBalance);
   }
 
-  private Product getProduct(String productId) {
+  private Product getProduct(UUID productId) {
     return productRepository
         .findById(productId)
         .orElseThrow(() -> new CreateOrderException("Product: " + productId + " does not exist"));

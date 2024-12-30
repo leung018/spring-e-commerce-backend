@@ -1,31 +1,32 @@
 package com.leungcheng.spring_simple_backend.domain.order;
 
 import jakarta.persistence.*;
+import java.util.UUID;
 
 @Entity
 @Table(
     name = "orders",
     uniqueConstraints = {@UniqueConstraint(columnNames = {"requestId", "buyerUserId"})})
 public class Order {
-  @Id private final String id = java.util.UUID.randomUUID().toString();
-  private String buyerUserId;
+  @Id private final UUID id = UUID.randomUUID();
+  private UUID buyerUserId;
   private PurchaseItems purchaseItems;
 
-  private String requestId;
+  private UUID requestId;
 
   private Order() {}
 
-  Order(String buyerUserId, PurchaseItems purchaseItems, String requestId) {
+  Order(UUID buyerUserId, PurchaseItems purchaseItems, UUID requestId) {
     this.buyerUserId = buyerUserId;
     this.purchaseItems = purchaseItems;
     this.requestId = requestId;
   }
 
-  public String getId() {
+  public UUID getId() {
     return id;
   }
 
-  public String getBuyerUserId() {
+  public UUID getBuyerUserId() {
     return buyerUserId;
   }
 
@@ -33,7 +34,7 @@ public class Order {
     return purchaseItems;
   }
 
-  public String getRequestId() {
+  public UUID getRequestId() {
     return requestId;
   }
 }

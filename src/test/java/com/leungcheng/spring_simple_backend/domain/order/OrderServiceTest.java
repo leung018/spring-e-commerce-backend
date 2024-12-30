@@ -11,6 +11,7 @@ import com.leungcheng.spring_simple_backend.domain.order.OrderService.CreateOrde
 import com.leungcheng.spring_simple_backend.testutil.DefaultBuilders;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,9 @@ class OrderServiceTest {
 
   private final User seedSeller = uniqueUsernameUserBuilder().build();
 
+  private final UUID seedRequestId1 = UUID.randomUUID();
+  private final UUID seedRequestId2 = UUID.randomUUID();
+
   @BeforeEach
   void setUp() {
     orderRepository.deleteAll();
@@ -58,8 +62,25 @@ class OrderServiceTest {
 
     CreateOrderException exception =
         assertThrows(
-            CreateOrderException.class, () -> createOrder("non_existing_buyer_id", purchaseItems));
+            CreateOrderException.class, () -> createOrder(UUID.randomUUID(), purchaseItems));
     assertEquals("Buyer does not exist", exception.getMessage());
+  }
+
+  @Test
+  void shouldRejectCreateOrderWithNullRequestId() {
+    Product product = productBuilder().price(BigDecimal.valueOf(1)).quantity(99).build();
+    productRepository.save(product);
+
+    PurchaseItems purchaseItems = new PurchaseItems();
+    purchaseItems.setPurchaseItem(product.getId(), 1);
+
+    User buyer = uniqueUsernameUserBuilder().balance(BigDecimal.valueOf(999)).build();
+    userRepository.save(buyer);
+
+    CreateOrderException exception =
+        assertThrows(
+            CreateOrderException.class, () -> createOrder(buyer.getId(), purchaseItems, null));
+    assertEquals("Request ID cannot be null", exception.getMessage());
   }
 
   @Test
@@ -79,12 +100,14 @@ class OrderServiceTest {
     User buyer = uniqueUsernameUserBuilder().build();
     userRepository.save(buyer);
 
+    UUID nonExistingProductId = UUID.randomUUID();
+
     PurchaseItems purchaseItems = new PurchaseItems();
-    purchaseItems.setPurchaseItem("non_existing_product_id", 1);
+    purchaseItems.setPurchaseItem(nonExistingProductId, 1);
 
     CreateOrderException exception =
         assertThrows(CreateOrderException.class, () -> createOrder(buyer.getId(), purchaseItems));
-    assertEquals("Product: non_existing_product_id does not exist", exception.getMessage());
+    assertEquals("Product: " + nonExistingProductId + " does not exist", exception.getMessage());
   }
 
   @Test
@@ -226,8 +249,8 @@ class OrderServiceTest {
     PurchaseItems purchaseItems = new PurchaseItems();
     purchaseItems.setPurchaseItem(product.getId(), 1);
 
-    Order order1 = createOrder(buyer.getId(), purchaseItems, "request-01");
-    Order order2 = createOrder(buyer.getId(), purchaseItems, "request-02");
+    Order order1 = createOrder(buyer.getId(), purchaseItems, seedRequestId1);
+    Order order2 = createOrder(buyer.getId(), purchaseItems, seedRequestId2);
 
     assertNotEquals(order1.getId(), order2.getId());
   }
@@ -243,8 +266,8 @@ class OrderServiceTest {
     PurchaseItems purchaseItems = new PurchaseItems();
     purchaseItems.setPurchaseItem(product.getId(), 1);
 
-    Order order1 = createOrder(buyer.getId(), purchaseItems, "request_id");
-    Order order2 = createOrder(buyer.getId(), purchaseItems, "request_id");
+    Order order1 = createOrder(buyer.getId(), purchaseItems, seedRequestId1);
+    Order order2 = createOrder(buyer.getId(), purchaseItems, seedRequestId1);
 
     assertOrderEquals(order2, order1);
     assertEquals(4, productRepository.findById(product.getId()).orElseThrow().getQuantity());
@@ -264,8 +287,8 @@ class OrderServiceTest {
     PurchaseItems purchaseItems = new PurchaseItems();
     purchaseItems.setPurchaseItem(product.getId(), 1);
 
-    Order order1 = createOrder(buyer1.getId(), purchaseItems, "request_id");
-    Order order2 = createOrder(buyer2.getId(), purchaseItems, "request_id");
+    Order order1 = createOrder(buyer1.getId(), purchaseItems, seedRequestId1);
+    Order order2 = createOrder(buyer2.getId(), purchaseItems, seedRequestId1);
 
     assertNotEquals(order1.getId(), order2.getId());
   }
@@ -284,8 +307,8 @@ class OrderServiceTest {
     purchaseItems.setPurchaseItem(product.getId(), 1);
 
     // 2 threads try to buy the same product at the same time
-    Thread thread1 = new Thread(() -> createOrder(buyer.getId(), purchaseItems, "request-01"));
-    Thread thread2 = new Thread(() -> createOrder(buyer.getId(), purchaseItems, "request-02"));
+    Thread thread1 = new Thread(() -> createOrder(buyer.getId(), purchaseItems, seedRequestId1));
+    Thread thread2 = new Thread(() -> createOrder(buyer.getId(), purchaseItems, seedRequestId2));
 
     thread1.start();
     thread2.start();
@@ -300,11 +323,11 @@ class OrderServiceTest {
     assertEquals(0, productRepository.findById(product.getId()).orElseThrow().getQuantity());
   }
 
-  private Order createOrder(String buyerUserId, PurchaseItems purchaseItems) {
-    return orderService.createOrder(buyerUserId, purchaseItems, "dummy_request_id");
+  private Order createOrder(UUID buyerUserId, PurchaseItems purchaseItems) {
+    return orderService.createOrder(buyerUserId, purchaseItems, UUID.randomUUID());
   }
 
-  private Order createOrder(String buyerUserId, PurchaseItems purchaseItems, String requestId) {
+  private Order createOrder(UUID buyerUserId, PurchaseItems purchaseItems, UUID requestId) {
     return orderService.createOrder(buyerUserId, purchaseItems, requestId);
   }
 

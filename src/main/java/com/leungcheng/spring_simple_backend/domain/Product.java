@@ -8,7 +8,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
+import java.util.UUID;
 
 @Entity
 @Table(name = "products")
@@ -17,10 +19,10 @@ public class Product {
     private String name;
     private BigDecimal price;
     private int quantity;
-    private String userId;
-    private String id = java.util.UUID.randomUUID().toString();
+    private UUID userId;
+    private UUID id = UUID.randomUUID();
 
-    private Builder id(String id) {
+    private Builder id(UUID id) {
       this.id = id;
       return this;
     }
@@ -40,7 +42,7 @@ public class Product {
       return this;
     }
 
-    public Builder userId(String userId) {
+    public Builder userId(UUID userId) {
       this.userId = userId;
       return this;
     }
@@ -66,9 +68,9 @@ public class Product {
 
   @Id
   @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-  private String id;
+  private UUID id;
 
-  @NotBlank private String userId;
+  @NotNull private UUID userId;
 
   @NotBlank private String name;
 
@@ -79,11 +81,11 @@ public class Product {
   @Min(0)
   private int quantity;
 
-  public String getId() {
+  public UUID getId() {
     return id;
   }
 
-  public String getUserId() {
+  public UUID getUserId() {
     return userId;
   }
 

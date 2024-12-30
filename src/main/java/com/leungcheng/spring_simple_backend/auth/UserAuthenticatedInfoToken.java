@@ -17,7 +17,7 @@ public class UserAuthenticatedInfoToken extends AbstractAuthenticationToken {
   }
 
   @Override
-  public String getPrincipal() {
-    return userAuthenticatedInfo.userId();
+  public UserAuthenticatedInfo getPrincipal() {
+    return userAuthenticatedInfo;
   }
 }

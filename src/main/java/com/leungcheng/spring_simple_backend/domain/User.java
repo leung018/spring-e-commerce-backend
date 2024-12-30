@@ -10,6 +10,7 @@ import jakarta.validation.constraints.NotBlank;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -22,9 +23,9 @@ public class User implements UserDetails {
     private String username;
     private String password;
     private BigDecimal balance;
-    private String id = java.util.UUID.randomUUID().toString();
+    private UUID id = java.util.UUID.randomUUID();
 
-    private Builder id(String id) {
+    private Builder id(UUID id) {
       this.id = id;
       return this;
     }
@@ -63,7 +64,7 @@ public class User implements UserDetails {
     return new User.Builder().username(username).password(password).balance(balance).id(id);
   }
 
-  @Id private String id;
+  @Id private UUID id;
 
   @Column(unique = true)
   @NotBlank
@@ -80,7 +81,7 @@ public class User implements UserDetails {
     return List.of(); // TODO: May be not return empty list
   }
 
-  public String getId() {
+  public UUID getId() {
     return id;
   }
 

@@ -15,6 +15,7 @@ import com.leungcheng.spring_simple_backend.domain.UserRepository;
 import com.leungcheng.spring_simple_backend.domain.order.OrderService;
 import com.leungcheng.spring_simple_backend.validation.ObjectValidator.ObjectValidationException;
 import java.math.BigDecimal;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -54,7 +55,7 @@ class SpringSimpleBackendApplicationTests {
     return !this.accessToken.isEmpty();
   }
 
-  private String useNewUserAccessToken() throws Exception {
+  private UUID useNewUserAccessToken() throws Exception {
     UserCredentials userCredentials = UserCredentials.sample();
 
     signup(userCredentials).andExpect(status().isCreated());
@@ -109,7 +110,7 @@ class SpringSimpleBackendApplicationTests {
   @Test
   void shouldHandleObjectValidationException_AndIncludeTheProperInfoInTheResponse()
       throws Exception {
-    String userId = useNewUserAccessToken();
+    UUID userId = useNewUserAccessToken();
 
     CreateProductParams params = CreateProductParams.sample();
     params.price = "-1";
@@ -140,9 +141,11 @@ class SpringSimpleBackendApplicationTests {
   void shouldGet404WhenProductNotFound() throws Exception {
     useNewUserAccessToken();
 
-    getProduct("invalid-id")
+    UUID productId = UUID.randomUUID();
+
+    getProduct(productId.toString())
         .andExpect(status().isNotFound())
-        .andExpect(content().string("Could not find product invalid-id"));
+        .andExpect(content().string("Could not find product " + productId));
   }
 
   @Test
@@ -229,12 +232,12 @@ class SpringSimpleBackendApplicationTests {
 
   @Test
   void shouldCreateProductWithUserIdSameAsCreator() throws Exception {
-    String userId = useNewUserAccessToken();
+    UUID userId = useNewUserAccessToken();
 
     CreateProductParams params = CreateProductParams.sample();
     createProduct(params)
         .andExpect(status().isCreated())
-        .andExpect(jsonPath("$.userId").value(userId));
+        .andExpect(jsonPath("$.userId").value(userId.toString()));
   }
 
   @Test
@@ -260,7 +263,7 @@ class SpringSimpleBackendApplicationTests {
 
   @Test
   void shouldCreateOrder() throws Exception {
-    String userId = useNewUserAccessToken();
+    UUID userId = useNewUserAccessToken();
 
     CreateProductParams productParams = CreateProductParams.sample();
 
@@ -273,8 +276,9 @@ class SpringSimpleBackendApplicationTests {
     String product2Id = createProductAndGetId(productParams);
 
     // Create Order
+    String requestId = UUID.randomUUID().toString();
     CreateOrderParams createOrderParams =
-        new CreateOrderParams("request-001", ImmutableMap.of(product1Id, 4, product2Id, 5));
+        new CreateOrderParams(requestId, ImmutableMap.of(product1Id, 4, product2Id, 5));
 
     createOrder(createOrderParams)
         .andExpect(status().isCreated())
@@ -282,23 +286,8 @@ class SpringSimpleBackendApplicationTests {
         .andExpect(jsonPath("$.purchaseItems").exists())
         .andExpect(jsonPath("$.purchaseItems.productIdToQuantity." + product1Id).value(4))
         .andExpect(jsonPath("$.purchaseItems.productIdToQuantity." + product2Id).value(5))
-        .andExpect(jsonPath("$.requestId").value("request-001"))
-        .andExpect(jsonPath("$.buyerUserId").value(userId));
-  }
-
-  @Test
-  void shouldCreateOrderRejectTooLongRequestId() throws Exception {
-    useNewUserAccessToken();
-
-    CreateProductParams productParams = CreateProductParams.sample();
-    productParams.price = "1";
-    productParams.quantity = 99;
-    String productId = createProductAndGetId(productParams);
-
-    CreateOrderParams createOrderParams =
-        new CreateOrderParams("1".repeat(37), ImmutableMap.of(productId, 1));
-
-    createOrder(createOrderParams).andExpect(status().isBadRequest());
+        .andExpect(jsonPath("$.requestId").value(requestId))
+        .andExpect(jsonPath("$.buyerUserId").value(userId.toString()));
   }
 
   @Test
@@ -308,8 +297,7 @@ class SpringSimpleBackendApplicationTests {
     CreateProductParams productParams = CreateProductParams.sample();
     String productId = createProductAndGetId(productParams);
 
-    CreateOrderParams createOrderParams =
-        new CreateOrderParams("request-001", ImmutableMap.of(productId, -1));
+    CreateOrderParams createOrderParams = new CreateOrderParams(ImmutableMap.of(productId, -1));
 
     createOrder(createOrderParams)
         .andExpect(status().isBadRequest())
@@ -324,13 +312,15 @@ class SpringSimpleBackendApplicationTests {
     productParams.quantity = 0;
     String productId = createProductAndGetId(productParams);
 
-    CreateOrderParams createOrderParams =
-        new CreateOrderParams("request-001", ImmutableMap.of(productId, 1));
+    CreateOrderParams createOrderParams = new CreateOrderParams(ImmutableMap.of(productId, 1));
 
     createOrder(createOrderParams)
         .andExpect(status().isBadRequest())
         .andExpect(
-            content().string(OrderService.CreateOrderException.insufficientStockMsg(productId)));
+            content()
+                .string(
+                    OrderService.CreateOrderException.insufficientStockMsg(
+                        UUID.fromString(productId))));
   }
 
   private static class CreateProductParams {
@@ -425,6 +415,10 @@ class SpringSimpleBackendApplicationTests {
     CreateOrderParams(String requestId, ImmutableMap<String, Integer> productIdToQuantity) {
       this.requestId = requestId;
       this.productIdToQuantity = productIdToQuantity;
+    }
+
+    CreateOrderParams(ImmutableMap<String, Integer> productIdToQuantity) {
+      this(UUID.randomUUID().toString(), productIdToQuantity);
     }
 
     String toContent() {

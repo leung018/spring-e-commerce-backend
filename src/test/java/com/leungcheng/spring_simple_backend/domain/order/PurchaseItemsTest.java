@@ -5,27 +5,31 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.google.common.collect.ImmutableMap;
 import com.leungcheng.spring_simple_backend.validation.MyIllegalArgumentException;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
 class PurchaseItemsTest {
+  UUID seedProductId1 = UUID.randomUUID();
+  UUID seedProductId2 = UUID.randomUUID();
+
   @Test
   void shouldSetPurchaseItemAndGetThem() {
     PurchaseItems purchaseItems = new PurchaseItems();
-    purchaseItems.setPurchaseItem("product_id_1", 1);
-    purchaseItems.setPurchaseItem("product_id_2", 2);
+    purchaseItems.setPurchaseItem(seedProductId1, 1);
+    purchaseItems.setPurchaseItem(seedProductId2, 2);
 
-    ImmutableMap<String, Integer> map = purchaseItems.getProductIdToQuantity();
-    assertEquals(ImmutableMap.of("product_id_1", 1, "product_id_2", 2), map);
+    assertEquals(
+        ImmutableMap.of(seedProductId1, 1, seedProductId2, 2),
+        purchaseItems.getProductIdToQuantity());
   }
 
   @Test
   void shouldDuplicateCallToSetExistingProductId_WillOverwriteTheQuantity() {
     PurchaseItems purchaseItems = new PurchaseItems();
-    purchaseItems.setPurchaseItem("product_id_1", 1);
-    purchaseItems.setPurchaseItem("product_id_1", 2);
+    purchaseItems.setPurchaseItem(seedProductId1, 1);
+    purchaseItems.setPurchaseItem(seedProductId1, 2);
 
-    ImmutableMap<String, Integer> map = purchaseItems.getProductIdToQuantity();
-    assertEquals(ImmutableMap.of("product_id_1", 2), map);
+    assertEquals(ImmutableMap.of(seedProductId1, 2), purchaseItems.getProductIdToQuantity());
   }
 
   @Test
@@ -33,11 +37,10 @@ class PurchaseItemsTest {
     PurchaseItems purchaseItems = new PurchaseItems();
 
     assertThrows(
-        MyIllegalArgumentException.class, () -> purchaseItems.setPurchaseItem("product_id", 0));
+        MyIllegalArgumentException.class, () -> purchaseItems.setPurchaseItem(seedProductId1, 0));
     assertThrows(
-        MyIllegalArgumentException.class, () -> purchaseItems.setPurchaseItem("product_id", -1));
+        MyIllegalArgumentException.class, () -> purchaseItems.setPurchaseItem(seedProductId1, -1));
 
-    ImmutableMap<String, Integer> map = purchaseItems.getProductIdToQuantity();
-    assertEquals(0, map.size());
+    assertEquals(0, purchaseItems.getProductIdToQuantity().size());
   }
 }

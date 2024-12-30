@@ -14,8 +14,7 @@ public class MeController {
 
   @GetMapping("/me")
   public UserAccountInfo me(UserAuthenticatedInfoToken authToken) {
-    String userId = authToken.getPrincipal();
-    User user = userRepository.findById(userId).orElseThrow();
+    User user = userRepository.findById(authToken.getPrincipal().userId()).orElseThrow();
     return new UserAccountInfo(user.getUsername(), user.getBalance());
   }
 
