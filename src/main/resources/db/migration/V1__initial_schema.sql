@@ -1,7 +1,7 @@
 CREATE
     TABLE
         orders(
-            buyer_user_id UUID,
+            buyer_user_id UUID NOT NULL,
             id UUID NOT NULL,
             request_id UUID NOT NULL,
             PRIMARY KEY(id),
@@ -17,7 +17,7 @@ CREATE
             price NUMERIC(
                 19,
                 10
-            ),
+            ) NOT NULL,
             quantity INTEGER NOT NULL,
             id UUID NOT NULL,
             name VARCHAR(255) NOT NULL,
