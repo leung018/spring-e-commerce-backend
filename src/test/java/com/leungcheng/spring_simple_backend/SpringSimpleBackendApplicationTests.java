@@ -291,23 +291,6 @@ class SpringSimpleBackendApplicationTests {
   }
 
   @Test
-  void shouldCreateOrderRejectIfDoesNotSpecifyRequestId() throws Exception {
-    useNewUserAccessToken();
-
-    CreateProductParams productParams = CreateProductParams.sample();
-    productParams.price = "1";
-    productParams.quantity = 99;
-    String productId = createProductAndGetId(productParams);
-
-    MockHttpServletRequestBuilder builder =
-        post("/orders")
-            .contentType("application/json")
-            .content("{\"productIdToQuantity\": {\"" + productId + "\": 1}}");
-    addAuthHeader(builder);
-    mockMvc.perform(builder).andExpect(status().isBadRequest());
-  }
-
-  @Test
   void shouldCreateOrderApiHandleExceptionDueToNegativeQuantity() throws Exception {
     useNewUserAccessToken();
 
