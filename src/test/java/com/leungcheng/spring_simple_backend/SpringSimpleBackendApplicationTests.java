@@ -12,6 +12,7 @@ import com.leungcheng.spring_simple_backend.domain.Product;
 import com.leungcheng.spring_simple_backend.domain.ProductRepository;
 import com.leungcheng.spring_simple_backend.domain.User;
 import com.leungcheng.spring_simple_backend.domain.UserRepository;
+import com.leungcheng.spring_simple_backend.domain.order.OrderRepository;
 import com.leungcheng.spring_simple_backend.domain.order.OrderService;
 import com.leungcheng.spring_simple_backend.validation.ObjectValidator.ObjectValidationException;
 import java.math.BigDecimal;
@@ -34,11 +35,13 @@ class SpringSimpleBackendApplicationTests {
   @Autowired private MockMvc mockMvc;
   @Autowired private ProductRepository productRepository;
   @Autowired private UserRepository userRepository;
+  @Autowired private OrderRepository orderRepository;
 
   private String accessToken = "";
 
   @BeforeEach
   public void setup() {
+    orderRepository.deleteAll();
     productRepository.deleteAll();
     userRepository.deleteAll();
   }
