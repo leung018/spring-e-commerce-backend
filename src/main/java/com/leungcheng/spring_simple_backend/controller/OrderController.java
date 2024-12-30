@@ -31,6 +31,5 @@ public class OrderController {
         authToken.getPrincipal().userId(), purchaseItems, createOrderRequest.requestId());
   }
 
-  public record CreateOrderRequest(
-      UUID requestId, Map<UUID, Integer> productIdToQuantity) {}
+  public record CreateOrderRequest(UUID requestId, Map<UUID, Integer> productIdToQuantity) {}
 }
