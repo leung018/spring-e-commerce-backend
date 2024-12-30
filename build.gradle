@@ -81,3 +81,9 @@ tasks.register("testLocal") {
 	dependsOn tasks.named("runDb")
 	finalizedBy tasks.named("test")
 }
+
+tasks.register("runLocal") {
+	description = "Start the database container if needed and run the application."
+	dependsOn tasks.named("runDb")
+	finalizedBy tasks.named("bootRun")
+}
