@@ -38,6 +38,10 @@ public class OrderService {
   @Retryable(noRetryFor = CreateOrderException.class)
   @Transactional(isolation = Isolation.SERIALIZABLE)
   public Order createOrder(UUID buyerUserId, PurchaseItems purchaseItems, UUID requestId) {
+    if (requestId == null) {
+      throw new CreateOrderException("Request ID cannot be null");
+    }
+
     Optional<Order> order = orderRepository.findByBuyerUserIdAndRequestId(buyerUserId, requestId);
     if (order.isPresent()) {
       return order.get();

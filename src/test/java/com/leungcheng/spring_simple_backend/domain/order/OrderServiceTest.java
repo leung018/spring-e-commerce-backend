@@ -67,6 +67,23 @@ class OrderServiceTest {
   }
 
   @Test
+  void shouldRejectCreateOrderWithNullRequestId() {
+    Product product = productBuilder().price(BigDecimal.valueOf(1)).quantity(99).build();
+    productRepository.save(product);
+
+    PurchaseItems purchaseItems = new PurchaseItems();
+    purchaseItems.setPurchaseItem(product.getId(), 1);
+
+    User buyer = uniqueUsernameUserBuilder().balance(BigDecimal.valueOf(999)).build();
+    userRepository.save(buyer);
+
+    CreateOrderException exception =
+        assertThrows(
+            CreateOrderException.class, () -> createOrder(buyer.getId(), purchaseItems, null));
+    assertEquals("Request ID cannot be null", exception.getMessage());
+  }
+
+  @Test
   void shouldRejectCreateOrderWithEmptyPurchaseItems() {
     User buyer = uniqueUsernameUserBuilder().build();
     userRepository.save(buyer);
