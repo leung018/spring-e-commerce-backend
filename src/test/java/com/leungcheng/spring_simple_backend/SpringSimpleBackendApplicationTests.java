@@ -291,7 +291,7 @@ class SpringSimpleBackendApplicationTests {
   }
 
   @Test
-  void shouldCreateOrderRejectTooLongRequestId() throws Exception {
+  void shouldCreateOrderRejectIfDoesNotSpecifyRequestId() throws Exception {
     useNewUserAccessToken();
 
     CreateProductParams productParams = CreateProductParams.sample();
@@ -299,10 +299,12 @@ class SpringSimpleBackendApplicationTests {
     productParams.quantity = 99;
     String productId = createProductAndGetId(productParams);
 
-    CreateOrderParams createOrderParams =
-        new CreateOrderParams("1".repeat(37), ImmutableMap.of(productId, 1));
-
-    createOrder(createOrderParams).andExpect(status().isBadRequest());
+    MockHttpServletRequestBuilder builder =
+        post("/orders")
+            .contentType("application/json")
+            .content("{\"productIdToQuantity\": {\"" + productId + "\": 1}}");
+    addAuthHeader(builder);
+    mockMvc.perform(builder).andExpect(status().isBadRequest());
   }
 
   @Test
