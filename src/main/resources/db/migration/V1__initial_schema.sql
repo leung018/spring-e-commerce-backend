@@ -35,7 +35,8 @@ CREATE
                 order_id,
                 product_id
             ),
-            CONSTRAINT FK_purchase_items_order_id FOREIGN KEY(order_id) REFERENCES orders(id)
+            CONSTRAINT FK_purchase_items_order_id FOREIGN KEY(order_id) REFERENCES orders(id),
+            CONSTRAINT FK_purchase_items_product_id FOREIGN KEY(product_id) REFERENCES products(id)
         );
 
 CREATE
