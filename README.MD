@@ -1,4 +1,4 @@
-# Spring Simple Backend
+# Spring E-Commerce Backend
 
 ## Introduction
 
